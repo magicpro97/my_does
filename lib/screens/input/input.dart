@@ -2,9 +2,11 @@ import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:my_does/screens/base/background_widget.dart';
+import 'package:my_does/screens/home/home.dart';
 
 class InputScreen extends StatelessWidget {
-  static String routeName = 'InputScreen';
+  static String routeAddName = '/AddScreen';
+  static String routeEditName = '/EditScreen';
   final _dateFormat = DateFormat('dd-MM-yyyy');
   final _timeFormat = DateFormat("HH:mm");
   final String title;
@@ -16,7 +18,7 @@ class InputScreen extends StatelessWidget {
     return Scaffold(
       body: BackgroundWidget(
         top: _inputTile(),
-        bottom: _input(),
+        bottom: _input(context),
       ),
     );
   }
@@ -29,7 +31,7 @@ class InputScreen extends StatelessWidget {
         ));
   }
 
-  Widget _input() {
+  Widget _input(BuildContext context) {
     return Container(
       height: double.infinity,
       margin: EdgeInsets.only(left: 8.0, right: 8.0),
@@ -101,7 +103,12 @@ class InputScreen extends StatelessWidget {
                   width: double.infinity,
                   height: 50.0,
                   child: RaisedButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.pushNamedAndRemoveUntil(
+                          context,
+                          HomeScreen.routeName,
+                              (Route<dynamic> route) => false);
+                    },
                     child: Text(
                       'Create Now',
                       style: TextStyle(fontSize: 18),
@@ -114,7 +121,9 @@ class InputScreen extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: FlatButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
                   child: Text(
                     'Cancel',
                     style: TextStyle(fontSize: 18),

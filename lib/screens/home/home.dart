@@ -1,16 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:my_does/screens/base/background_widget.dart';
 import 'package:my_does/screens/home/todo_card.dart';
+import 'package:my_does/screens/input/input.dart';
 
 class HomeScreen extends StatelessWidget {
-  static String routeName = 'HomeScreen';
+  static String routeName = '/HomeScreen';
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: BackgroundWidget(top: _homeTitle(), bottom: _todoList()),
       floatingActionButton: FloatingActionButton(
-        onPressed: null,
+        onPressed: () {
+          Navigator.pushNamed(context, InputScreen.routeAddName);
+        },
         child: Icon(Icons.add),
       ),
     );
