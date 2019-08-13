@@ -3,6 +3,8 @@ import 'package:my_does/screens/base/background_widget.dart';
 import 'package:my_does/screens/home/todo_card.dart';
 
 class HomeScreen extends StatelessWidget {
+  static String routeName = 'HomeScreen';
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

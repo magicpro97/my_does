@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:my_does/screens/base/background_widget.dart';
 
 class InputScreen extends StatelessWidget {
+  static String routeName = 'InputScreen';
   final _dateFormat = DateFormat('dd-MM-yyyy');
   final _timeFormat = DateFormat("HH:mm");
   final String title;
