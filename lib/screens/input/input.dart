@@ -58,8 +58,17 @@ class InputScreen extends StatelessWidget {
                 padding: const EdgeInsets.all(16.0),
                 child: TextFormField(
                   decoration: InputDecoration(
-                      labelText: 'Timeline',
+                      labelText: 'Date',
                       hintText: 'When will?',
+                      border: OutlineInputBorder()),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: TextFormField(
+                  decoration: InputDecoration(
+                      labelText: 'Time',
+                      hintText: 'What time?',
                       border: OutlineInputBorder()),
                 ),
               ),
