@@ -1,7 +1,11 @@
+import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:my_does/screens/base/background_widget.dart';
 
 class InputScreen extends StatelessWidget {
+  final _dateFormat = DateFormat('dd-MM-yyyy');
+  final _timeFormat = DateFormat("HH:mm");
   final String title;
 
   InputScreen({this.title});
@@ -19,9 +23,9 @@ class InputScreen extends StatelessWidget {
   Widget _inputTile() {
     return Center(
         child: Text(
-      this.title,
-      style: TextStyle(fontSize: 20, color: Colors.white),
-    ));
+          this.title,
+          style: TextStyle(fontSize: 24, color: Colors.white),
+        ));
   }
 
   Widget _input() {
@@ -30,7 +34,7 @@ class InputScreen extends StatelessWidget {
       margin: EdgeInsets.only(left: 8.0, right: 8.0),
       child: Card(
         shape:
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.0)),
+        RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.0)),
         child: SingleChildScrollView(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
@@ -56,20 +60,38 @@ class InputScreen extends StatelessWidget {
               ),
               Padding(
                 padding: const EdgeInsets.all(16.0),
-                child: TextFormField(
+                child: DateTimeField(
+                  format: _dateFormat,
                   decoration: InputDecoration(
                       labelText: 'Date',
                       hintText: 'When will?',
                       border: OutlineInputBorder()),
+                  onShowPicker: (BuildContext context, DateTime currentValue) {
+                    return showDatePicker(
+                        context: context,
+                        firstDate: DateTime(1900),
+                        initialDate: currentValue ?? DateTime.now(),
+                        lastDate: DateTime(2100));
+                  },
                 ),
               ),
               Padding(
                 padding: const EdgeInsets.all(16.0),
-                child: TextFormField(
+                child: DateTimeField(
                   decoration: InputDecoration(
                       labelText: 'Time',
                       hintText: 'What time?',
                       border: OutlineInputBorder()),
+                  format: _timeFormat,
+                  onShowPicker:
+                      (BuildContext context, DateTime currentValue) async {
+                    final time = await showTimePicker(
+                      context: context,
+                      initialTime: TimeOfDay.fromDateTime(
+                          currentValue ?? DateTime.now()),
+                    );
+                    return DateTimeField.convert(time);
+                  },
                 ),
               ),
               Padding(
