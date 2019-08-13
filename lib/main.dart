@@ -7,12 +7,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: Scaffold(
-        body: HomeScreen(),
-        floatingActionButton: FloatingActionButton(
-          child: Icon(Icons.add), onPressed: () {}, backgroundColor: Colors.blue[900],
-        ),
-      ),
-      );
+      home: HomeScreen(),
+    );
   }
 }
