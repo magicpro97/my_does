@@ -1,21 +1,18 @@
 import 'package:flutter/material.dart';
 
 class BackgroundWidget extends StatelessWidget {
-  Widget _top;
-  Widget _bottom;
+  final Widget top;
+  final Widget bottom;
 
-  BackgroundWidget(Widget top, Widget bottom) {
-    _top = top;
-    _bottom = bottom;
-  }
+  BackgroundWidget({this.top, this.bottom});
 
   @override
   Widget build(BuildContext context) {
     return Stack(children: <Widget>[
-      Container(height: 200, color: Colors.blue[900], child: _top),
+      Container(height: 200, color: Colors.blue[900], child: this.top),
       Container(
         margin: EdgeInsets.only(top: 150),
-        child: _bottom,
+        child: this.bottom,
       )
     ]);
   }

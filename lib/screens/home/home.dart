@@ -6,32 +6,15 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: BackgroundWidget(HomeTitle(), TodoList()),
+      body: BackgroundWidget(top: _homeTitle(), bottom: _todoList()),
       floatingActionButton: FloatingActionButton(
         onPressed: null,
         child: Icon(Icons.add),
       ),
     );
   }
-}
 
-class TodoList extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: <Widget>[
-        TodoCard(),
-        TodoCard(),
-        TodoCard(),
-        TodoCard(),
-      ],
-    );
-  }
-}
-
-class HomeTitle extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
+  Widget _homeTitle() {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -50,6 +33,17 @@ class HomeTitle extends StatelessWidget {
         Divider(
           color: Colors.white70,
         )
+      ],
+    );
+  }
+
+  Widget _todoList() {
+    return Column(
+      children: <Widget>[
+        TodoCard(),
+        TodoCard(),
+        TodoCard(),
+        TodoCard(),
       ],
     );
   }
