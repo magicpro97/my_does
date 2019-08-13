@@ -4,14 +4,33 @@ import 'package:intl/intl.dart';
 import 'package:my_does/screens/base/background_widget.dart';
 import 'package:my_does/screens/home/home.dart';
 
-class InputScreen extends StatelessWidget {
+class InputScreen extends StatefulWidget {
   static String routeAddName = '/AddScreen';
   static String routeEditName = '/EditScreen';
-  final _dateFormat = DateFormat('dd-MM-yyyy');
-  final _timeFormat = DateFormat("HH:mm");
+
+  final List<Map<String, dynamic>> todos;
+  final int index;
   final String title;
 
-  InputScreen({this.title});
+  InputScreen({this.title, this.todos, this.index});
+
+  @override
+  _InputScreenState createState() => _InputScreenState();
+}
+
+class _InputScreenState extends State<InputScreen> {
+  final _dateFormat = DateFormat('dd-MM-yyyy');
+  final _timeFormat = DateFormat("HH:mm");
+
+  final _titleController = TextEditingController();
+  final _descriptionController = TextEditingController();
+
+  @override
+  void dispose() {
+    _titleController.dispose();
+    _descriptionController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,12 +45,16 @@ class InputScreen extends StatelessWidget {
   Widget _inputTile() {
     return Center(
         child: Text(
-          this.title,
+          this.widget.title,
           style: TextStyle(fontSize: 24, color: Colors.white),
         ));
   }
 
   Widget _input(BuildContext context) {
+    final _todo = {
+      'id': (widget.todos.length + 1).toString(),
+    };
+
     return Container(
       height: double.infinity,
       margin: EdgeInsets.only(left: 8.0, right: 8.0),
@@ -46,6 +69,7 @@ class InputScreen extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: TextFormField(
+                  controller: _titleController,
                   decoration: InputDecoration(
                       labelText: 'Add Title',
                       hintText: 'What you do?',
@@ -55,6 +79,7 @@ class InputScreen extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: TextFormField(
+                  controller: _descriptionController,
                   decoration: InputDecoration(
                       labelText: 'Description',
                       hintText: 'How to?',
@@ -69,12 +94,18 @@ class InputScreen extends StatelessWidget {
                       labelText: 'Date',
                       hintText: 'When will?',
                       border: OutlineInputBorder()),
-                  onShowPicker: (BuildContext context, DateTime currentValue) {
+                  onShowPicker:
+                      (BuildContext context, DateTime currentValue) async {
                     return showDatePicker(
-                        context: context,
-                        firstDate: DateTime(1900),
-                        initialDate: currentValue ?? DateTime.now(),
-                        lastDate: DateTime(2100));
+                      context: context,
+                      firstDate: DateTime(1900),
+                      initialDate: currentValue ?? DateTime.now(),
+                      lastDate: DateTime(2100),
+                    );
+                  },
+                  onChanged: (dateTime) {
+                    _todo['date'] =
+                    '${dateTime.day}-${dateTime.month}-${dateTime.year}';
                   },
                 ),
               ),
@@ -95,6 +126,9 @@ class InputScreen extends StatelessWidget {
                     );
                     return DateTimeField.convert(time);
                   },
+                  onChanged: (dateTime) {
+                    _todo['time'] = '${dateTime.hour}:${dateTime.minute}';
+                  },
                 ),
               ),
               Padding(
@@ -104,6 +138,9 @@ class InputScreen extends StatelessWidget {
                   height: 50.0,
                   child: RaisedButton(
                     onPressed: () {
+                      _todo['title'] = _titleController.text;
+                      _todo['description'] = _titleController.text;
+                      widget.todos.add(_todo);
                       Navigator.pushNamedAndRemoveUntil(
                           context,
                           HomeScreen.routeName,

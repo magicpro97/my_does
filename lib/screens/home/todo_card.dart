@@ -1,16 +1,25 @@
 import 'package:flutter/material.dart';
 
-class TodoCard extends StatelessWidget {
+class TodoCardWidget extends StatelessWidget {
+  final Key key;
+  final String title;
+  final String description;
+  final String date;
+  final String time;
+
+  TodoCardWidget({this.key, this.title, this.description, this.date, this.time})
+      : super(key: key);
+
   @override
   Widget build(BuildContext context) {
-    return  Padding(
+    return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Card(
         elevation: 8.0,
         child: Row(
           children: <Widget>[
             Expanded(
-              flex: 3,
+              flex: 5,
               child: Padding(
                 padding: const EdgeInsets.all(12.0),
                 child: Column(
@@ -20,13 +29,12 @@ class TodoCard extends StatelessWidget {
                     Padding(
                       padding: const EdgeInsets.only(top: 8, bottom: 8),
                       child: Text(
-                        'Buy whikas',
-                        style:
-                        TextStyle(color: Colors.blue[900], fontSize: 26),
+                        '$title',
+                        style: TextStyle(color: Colors.blue[900], fontSize: 26),
                       ),
                     ),
                     Text(
-                      'Near market there is cat',
+                      '$description',
                       style: TextStyle(color: Colors.black12, fontSize: 18),
                     )
                   ],
@@ -34,14 +42,26 @@ class TodoCard extends StatelessWidget {
               ),
             ),
             Expanded(
-              flex: 1,
+              flex: 2,
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: Center(
-                  child: Text(
-                    'Tomorrow',
-                    style: TextStyle(color: Colors.pink[400], fontSize: 16,),
-                  ),
+                child: Column(
+                  children: <Widget>[
+                    Text(
+                      '$date',
+                      style: TextStyle(
+                        color: Colors.pink[400],
+                        fontSize: 16,
+                      ),
+                    ),
+                    Text(
+                      '$time',
+                      style: TextStyle(
+                        color: Colors.pink[400],
+                        fontSize: 16,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             )

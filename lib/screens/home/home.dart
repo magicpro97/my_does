@@ -5,11 +5,14 @@ import 'package:my_does/screens/input/input.dart';
 
 class HomeScreen extends StatelessWidget {
   static String routeName = '/HomeScreen';
+  final todos;
+
+  HomeScreen({this.todos});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: BackgroundWidget(top: _homeTitle(), bottom: _todoList()),
+      body: BackgroundWidget(top: _homeTitle(), bottom: _todoListWidget()),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.pushNamed(context, InputScreen.routeAddName);
@@ -42,14 +45,18 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _todoList() {
-    return Column(
-      children: <Widget>[
-        TodoCard(),
-        TodoCard(),
-        TodoCard(),
-        TodoCard(),
-      ],
+  Widget _todoListWidget() {
+    return ListView.builder(
+      itemCount: todos != null ? todos.length : 0,
+      itemBuilder: (BuildContext context, int index) {
+        return TodoCardWidget(
+          key: Key(todos[index]['id']),
+          title: todos[index]['title'],
+          description: todos[index]['description'],
+          date: todos[index]['date'],
+          time: todos[index]['time'],
+        );
+      },
     );
   }
 }

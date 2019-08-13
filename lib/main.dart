@@ -5,14 +5,25 @@ import 'package:my_does/screens/input/input.dart';
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
+  final _todos = [
+    {
+      'id': '0',
+      'title': 'Hello',
+      'description': 'Go go go',
+      'date': '10-10-2019',
+      'time': '4:50'
+    },
+  ];
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: InputScreen(title: 'Hello',),
+      home: HomeScreen(todos: _todos,),
       initialRoute: HomeScreen.routeName,
       routes: {
-        HomeScreen.routeName: (context) => HomeScreen(),
-        InputScreen.routeAddName: (context) => InputScreen(title: 'Hello'),
+        HomeScreen.routeName: (context) => HomeScreen(todos: _todos,),
+        InputScreen.routeAddName: (context) =>
+            InputScreen(title: 'Create a new', todos: _todos,),
       },
     );
   }
