@@ -49,12 +49,25 @@ class HomeScreen extends StatelessWidget {
     return ListView.builder(
       itemCount: todos != null ? todos.length : 0,
       itemBuilder: (BuildContext context, int index) {
-        return TodoCardWidget(
-          key: Key(todos[index]['id']),
-          title: todos[index]['title'],
-          description: todos[index]['description'],
-          date: todos[index]['date'],
-          time: todos[index]['time'],
+        return GestureDetector(
+          onTap: () {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) =>
+                        InputScreen(
+                          title: 'Edit the todo',
+                          todos: todos,
+                          index: index,
+                        )));
+          },
+          child: TodoCardWidget(
+            key: Key(todos[index]['id']),
+            title: todos[index]['title'],
+            description: todos[index]['description'],
+            date: todos[index]['date'],
+            time: todos[index]['time'],
+          ),
         );
       },
     );

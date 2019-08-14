@@ -24,6 +24,28 @@ class _InputScreenState extends State<InputScreen> {
 
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
+  final _dateController = TextEditingController();
+  final _timeController = TextEditingController();
+
+  var _todo;
+
+  @override
+  void initState() {
+    _todo = widget.index == null
+        ? {
+      'id': (widget.todos.length).toString(),
+    }
+        : widget.todos[widget.index];
+    _titleController.text = _todo['title'] ?? '';
+    _descriptionController.text = _todo['description'] ?? '';
+    _dateController.text = _todo['date'] != null
+        ? _todo['date']
+        : _dateFormat.format(DateTime.now());
+    _timeController.text = _todo['time'] != null
+        ? _todo['time']
+        : _timeFormat.format(DateTime.now());
+    super.initState();
+  }
 
   @override
   void dispose() {
@@ -51,10 +73,6 @@ class _InputScreenState extends State<InputScreen> {
   }
 
   Widget _input(BuildContext context) {
-    final _todo = {
-      'id': (widget.todos.length + 1).toString(),
-    };
-
     return Container(
       height: double.infinity,
       margin: EdgeInsets.only(left: 8.0, right: 8.0),
@@ -90,6 +108,7 @@ class _InputScreenState extends State<InputScreen> {
                 padding: const EdgeInsets.all(16.0),
                 child: DateTimeField(
                   format: _dateFormat,
+                  controller: _dateController,
                   decoration: InputDecoration(
                       labelText: 'Date',
                       hintText: 'When will?',
@@ -103,20 +122,17 @@ class _InputScreenState extends State<InputScreen> {
                       lastDate: DateTime(2100),
                     );
                   },
-                  onChanged: (dateTime) {
-                    _todo['date'] =
-                    '${dateTime.day}-${dateTime.month}-${dateTime.year}';
-                  },
                 ),
               ),
               Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: DateTimeField(
+                  format: _timeFormat,
+                  controller: _timeController,
                   decoration: InputDecoration(
                       labelText: 'Time',
                       hintText: 'What time?',
                       border: OutlineInputBorder()),
-                  format: _timeFormat,
                   onShowPicker:
                       (BuildContext context, DateTime currentValue) async {
                     final time = await showTimePicker(
@@ -125,9 +141,6 @@ class _InputScreenState extends State<InputScreen> {
                           currentValue ?? DateTime.now()),
                     );
                     return DateTimeField.convert(time);
-                  },
-                  onChanged: (dateTime) {
-                    _todo['time'] = '${dateTime.hour}:${dateTime.minute}';
                   },
                 ),
               ),
@@ -140,14 +153,18 @@ class _InputScreenState extends State<InputScreen> {
                     onPressed: () {
                       _todo['title'] = _titleController.text;
                       _todo['description'] = _titleController.text;
-                      widget.todos.add(_todo);
+                      _todo['date'] = _dateController.text;
+                      _todo['time'] = _timeController.text;
+                      if (widget.index == null) {
+                        widget.todos.add(_todo);
+                      }
                       Navigator.pushNamedAndRemoveUntil(
                           context,
                           HomeScreen.routeName,
                               (Route<dynamic> route) => false);
                     },
                     child: Text(
-                      'Create Now',
+                      widget.index == null ? 'Create Now' : 'Update',
                       style: TextStyle(fontSize: 18),
                     ),
                     textColor: Colors.white,
