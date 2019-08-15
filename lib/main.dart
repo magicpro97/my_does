@@ -1,18 +1,31 @@
 import 'package:flutter/material.dart';
+import 'package:my_does/data/models/todo.dart';
 import 'package:my_does/ui/home/home.dart';
 import 'package:my_does/ui/input/input.dart';
 
 void main() => runApp(MyApp());
 
-class MyApp extends StatelessWidget {
-  final _todoList = [
-    {
-      'id': '0',
-      'title': 'Hello',
-      'description': 'Go go go',
-      'date': '10-10-2019',
-      'time': '4:50'
-    },
+class MyApp extends StatefulWidget {
+  @override
+  _MyAppState createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  final List<Todo> _todoList = [
+    Todo(
+      id: '0',
+      title: 'Hello',
+      description: 'Go go go',
+      date: DateTime(2019, 10, 10),
+      time: DateTime(2019, 10, 10, 4, 50),
+    ),
+    Todo(
+      id: '0',
+      title: 'Hello',
+      description: 'Go go go',
+      date: DateTime(2019, 10, 10),
+      time: DateTime(2019, 10, 10, 4, 50),
+    ),
   ];
 
   @override

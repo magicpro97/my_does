@@ -1,13 +1,14 @@
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import 'package:my_does/data/models/todo.dart';
 import 'package:my_does/ui/home/home.dart';
+import 'package:my_does/utils/date_time_utils.dart';
 
 class InputScreen extends StatefulWidget {
   static String routeAddName = '/AddScreen';
   static String routeEditName = '/EditScreen';
 
-  final List<Map<String, dynamic>> todoList;
+  final List<Todo> todoList;
   final int index;
   final String title;
 
@@ -18,31 +19,26 @@ class InputScreen extends StatefulWidget {
 }
 
 class _InputScreenState extends State<InputScreen> {
-  final _dateFormat = DateFormat('dd-MM-yyyy');
-  final _timeFormat = DateFormat("HH:mm");
-
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
   final _dateController = TextEditingController();
   final _timeController = TextEditingController();
 
-  var _todo;
+  Todo _todo;
 
   @override
   void initState() {
     _todo = widget.index == null
-        ? {
-      'id': (widget.todoList.length).toString(),
-    }
+        ? Todo(id: widget.todoList.length.toString(), title: '')
         : widget.todoList[widget.index];
-    _titleController.text = _todo['title'] ?? '';
-    _descriptionController.text = _todo['description'] ?? '';
-    _dateController.text = _todo['date'] != null
-        ? _todo['date']
-        : _dateFormat.format(DateTime.now());
-    _timeController.text = _todo['time'] != null
-        ? _todo['time']
-        : _timeFormat.format(DateTime.now());
+    _titleController.text = _todo.title ?? '';
+    _descriptionController.text = _todo.description ?? '';
+    _dateController.text = _todo.date != null
+        ? DateTimeUtils.dateToString(_todo.date)
+        : DateTimeUtils.dateFormat.format(DateTime.now());
+    _timeController.text = _todo.time != null
+        ? DateTimeUtils.timeToString(_todo.time)
+        : DateTimeUtils.timeFormat.format(DateTime.now());
     super.initState();
   }
 
@@ -116,7 +112,7 @@ class _InputScreenState extends State<InputScreen> {
               Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: DateTimeField(
-                  format: _dateFormat,
+                  format: DateTimeUtils.dateFormat,
                   controller: _dateController,
                   decoration: InputDecoration(
                       labelText: 'Date',
@@ -136,7 +132,7 @@ class _InputScreenState extends State<InputScreen> {
               Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: DateTimeField(
-                  format: _timeFormat,
+                  format: DateTimeUtils.timeFormat,
                   controller: _timeController,
                   decoration: InputDecoration(
                       labelText: 'Time',
@@ -160,10 +156,12 @@ class _InputScreenState extends State<InputScreen> {
                   height: 50.0,
                   child: RaisedButton(
                     onPressed: () {
-                      _todo['title'] = _titleController.text;
-                      _todo['description'] = _titleController.text;
-                      _todo['date'] = _dateController.text;
-                      _todo['time'] = _timeController.text;
+                      _todo.title = _titleController.text;
+                      _todo.description = _titleController.text;
+                      _todo.date =
+                          DateTimeUtils.dateFormat.parse(_dateController.text);
+                      _todo.time =
+                          DateTimeUtils.timeFormat.parse(_timeController.text);
                       if (widget.index == null) {
                         widget.todoList.add(_todo);
                       }

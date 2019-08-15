@@ -1,18 +1,34 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:my_does/data/models/tag.dart';
+import 'package:my_does/data/models/todo.dart';
 import 'package:my_does/ui/input/input.dart';
 import 'package:my_does/ui/widgets/todo_card_item.dart';
+import 'package:my_does/utils/date_time_utils.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   static String routeName = '/HomeScreen';
-  final List<Map<String, dynamic>> todoList;
+  final List<Todo> todoList;
 
   HomeScreen({this.todoList});
 
+  @override
+  _HomeScreenState createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
   final List<Tag> _tags = [
     Tag(name: "All tags"),
     Tag(name: "Red tags", color: Colors.red),
   ];
+
+  List<Todo> _todoList;
+
+  @override
+  void initState() {
+    _todoList = widget.todoList;
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -94,8 +110,10 @@ class HomeScreen extends StatelessWidget {
   }
 
   Widget _todoListWidget() {
+    final SlidableController slidableController = SlidableController();
+
     return ListView.builder(
-      itemCount: this.todoList != null ? this.todoList.length : 0,
+      itemCount: this.widget.todoList != null ? this.widget.todoList.length : 0,
       itemBuilder: (BuildContext context, int index) {
         return GestureDetector(
           onTap: () {
@@ -105,19 +123,50 @@ class HomeScreen extends StatelessWidget {
                     builder: (context) =>
                         InputScreen(
                           title: 'Edit the todo',
-                          todoList: this.todoList,
+                          todoList: this.widget.todoList,
                           index: index,
                         )));
           },
-          child: TodoCardItem(
-            key: Key(this.todoList[index]['id']),
-            title: this.todoList[index]['title'],
-            description: this.todoList[index]['description'],
-            date: this.todoList[index]['date'],
-            time: this.todoList[index]['time'],
+          child: Slidable(
+            controller: slidableController,
+            actionPane: SlidableDrawerActionPane(),
+            secondaryActions: <Widget>[
+              IconSlideAction(
+                  caption: 'Delete',
+                  color: Colors.red,
+                  icon: Icons.delete,
+                  onTap: () =>
+                      _deleteTodoAction(
+                          context, widget.todoList[index], index)),
+            ],
+            child: TodoCardItem(
+              key: Key(this.widget.todoList[index].id),
+              title: this.widget.todoList[index].title,
+              description: this.widget.todoList[index].description,
+              date:
+              DateTimeUtils.dateToString(this.widget.todoList[index].date),
+              time:
+              DateTimeUtils.timeToString(this.widget.todoList[index].time),
+            ),
           ),
         );
       },
     );
+  }
+
+  void _deleteTodoAction(BuildContext context, Todo todo, int index) {
+    setState(() {
+      _todoList.remove(todo);
+    });
+    Scaffold.of(context).showSnackBar(SnackBar(
+      content: Text('Deleted'),
+      action: SnackBarAction(
+          label: 'Undo',
+          onPressed: () {
+            setState(() {
+              _todoList.insert(index, todo);
+            });
+          }),
+    ));
   }
 }
