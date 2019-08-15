@@ -5,7 +5,7 @@ import 'package:my_does/screens/input/input.dart';
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
-  final _todos = [
+  final _todoList = [
     {
       'id': '0',
       'title': 'Hello',
@@ -18,12 +18,12 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: HomeScreen(todos: _todos,),
+      home: HomeScreen(todoList: _todoList,),
       initialRoute: HomeScreen.routeName,
       routes: {
-        HomeScreen.routeName: (context) => HomeScreen(todos: _todos,),
+        HomeScreen.routeName: (context) => HomeScreen(todoList: _todoList,),
         InputScreen.routeAddName: (context) =>
-            InputScreen(title: 'Create a new', todos: _todos,),
+            InputScreen(title: 'Create a new', todoList: _todoList,),
       },
     );
   }

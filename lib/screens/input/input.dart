@@ -8,11 +8,11 @@ class InputScreen extends StatefulWidget {
   static String routeAddName = '/AddScreen';
   static String routeEditName = '/EditScreen';
 
-  final List<Map<String, dynamic>> todos;
+  final List<Map<String, dynamic>> todoList;
   final int index;
   final String title;
 
-  InputScreen({this.title, this.todos, this.index});
+  InputScreen({this.title, this.todoList, this.index});
 
   @override
   _InputScreenState createState() => _InputScreenState();
@@ -33,9 +33,9 @@ class _InputScreenState extends State<InputScreen> {
   void initState() {
     _todo = widget.index == null
         ? {
-      'id': (widget.todos.length).toString(),
+      'id': (widget.todoList.length).toString(),
     }
-        : widget.todos[widget.index];
+        : widget.todoList[widget.index];
     _titleController.text = _todo['title'] ?? '';
     _descriptionController.text = _todo['description'] ?? '';
     _dateController.text = _todo['date'] != null
@@ -156,7 +156,7 @@ class _InputScreenState extends State<InputScreen> {
                       _todo['date'] = _dateController.text;
                       _todo['time'] = _timeController.text;
                       if (widget.index == null) {
-                        widget.todos.add(_todo);
+                        widget.todoList.add(_todo);
                       }
                       Navigator.pushNamedAndRemoveUntil(
                           context,

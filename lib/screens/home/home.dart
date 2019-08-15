@@ -5,14 +5,15 @@ import 'package:my_does/screens/input/input.dart';
 
 class HomeScreen extends StatelessWidget {
   static String routeName = '/HomeScreen';
-  final todos;
+  final todoList;
 
-  HomeScreen({this.todos});
+  HomeScreen({this.todoList});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: BackgroundWidget(top: _homeTitle(), bottom: _todoListWidget()),
+      body: BackgroundWidget(
+          top: _homeTitleWidget(), bottom: _todoListWidget()),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.pushNamed(context, InputScreen.routeAddName);
@@ -22,7 +23,7 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _homeTitle() {
+  Widget _homeTitleWidget() {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -47,7 +48,7 @@ class HomeScreen extends StatelessWidget {
 
   Widget _todoListWidget() {
     return ListView.builder(
-      itemCount: todos != null ? todos.length : 0,
+      itemCount: todoList != null ? todoList.length : 0,
       itemBuilder: (BuildContext context, int index) {
         return GestureDetector(
           onTap: () {
@@ -57,16 +58,16 @@ class HomeScreen extends StatelessWidget {
                     builder: (context) =>
                         InputScreen(
                           title: 'Edit the todo',
-                          todos: todos,
+                          todoList: todoList,
                           index: index,
                         )));
           },
           child: TodoCardWidget(
-            key: Key(todos[index]['id']),
-            title: todos[index]['title'],
-            description: todos[index]['description'],
-            date: todos[index]['date'],
-            time: todos[index]['time'],
+            key: Key(todoList[index]['id']),
+            title: todoList[index]['title'],
+            description: todoList[index]['description'],
+            date: todoList[index]['date'],
+            time: todoList[index]['time'],
           ),
         );
       },
