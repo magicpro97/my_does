@@ -1,8 +1,7 @@
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:my_does/screens/base/background_widget.dart';
-import 'package:my_does/screens/home/home.dart';
+import 'package:my_does/ui/home/home.dart';
 
 class InputScreen extends StatefulWidget {
   static String routeAddName = '/AddScreen';
@@ -51,17 +50,27 @@ class _InputScreenState extends State<InputScreen> {
   void dispose() {
     _titleController.dispose();
     _descriptionController.dispose();
+    _dateController.dispose();
+    _timeController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: BackgroundWidget(
-        top: _inputTile(),
-        bottom: _input(context),
-      ),
-    );
+        body: Stack(children: <Widget>[
+          Container(
+              height: 220,
+              color: Colors.blue[900],
+              child: Padding(
+                padding: const EdgeInsets.only(top: 30.0),
+                child: _inputTile(),
+              )),
+          Container(
+            margin: const EdgeInsets.only(top: 150),
+            child: _input(),
+          )
+        ]));
   }
 
   Widget _inputTile() {
@@ -72,7 +81,7 @@ class _InputScreenState extends State<InputScreen> {
         ));
   }
 
-  Widget _input(BuildContext context) {
+  Widget _input() {
     return Container(
       height: double.infinity,
       margin: EdgeInsets.only(left: 8.0, right: 8.0),

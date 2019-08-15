@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:my_does/screens/home/home.dart';
-import 'package:my_does/screens/input/input.dart';
+import 'package:my_does/ui/home/home.dart';
+import 'package:my_does/ui/input/input.dart';
 
 void main() => runApp(MyApp());
 
@@ -18,12 +18,20 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: HomeScreen(todoList: _todoList,),
+      home: HomeScreen(
+        todoList: _todoList,
+      ),
       initialRoute: HomeScreen.routeName,
       routes: {
-        HomeScreen.routeName: (context) => HomeScreen(todoList: _todoList,),
+        HomeScreen.routeName: (context) =>
+            HomeScreen(
+              todoList: _todoList,
+            ),
         InputScreen.routeAddName: (context) =>
-            InputScreen(title: 'Create a new', todoList: _todoList,),
+            InputScreen(
+              title: 'Create a new',
+              todoList: _todoList,
+            ),
       },
     );
   }
