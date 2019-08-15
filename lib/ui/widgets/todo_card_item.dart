@@ -1,20 +1,36 @@
 import 'package:flutter/material.dart';
 
-class TodoCardItem extends StatelessWidget {
+class TodoCardItem extends StatefulWidget {
   final Key key;
   final String title;
   final String description;
   final String date;
   final String time;
   final Color tagColor;
+  final bool isCompleted;
 
-  TodoCardItem({this.key,
+  TodoCardItem({
+    this.key,
     this.title,
     this.description,
     this.date,
     this.time,
-    this.tagColor})
-      : super(key: key);
+    this.tagColor,
+    this.isCompleted,
+  }) : super(key: key);
+
+  @override
+  _TodoCardItemState createState() => _TodoCardItemState();
+}
+
+class _TodoCardItemState extends State<TodoCardItem> {
+  bool _isCompleted;
+
+  @override
+  void initState() {
+    _isCompleted = widget.isCompleted ?? false;
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -24,65 +40,88 @@ class TodoCardItem extends StatelessWidget {
       constraints: BoxConstraints(
         minHeight: 100.0,
       ),
-      child: Card(
-        elevation: 6.0,
-        child: Row(
-          children: <Widget>[
-            Expanded(
-              flex: 5,
-              child: Padding(
-                padding: const EdgeInsets.all(12.0),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 8),
-                      child: Text(
-                        '$title',
-                        style: TextStyle(color: Colors.blue[900], fontSize: 26),
+      child: Row(
+        children: <Widget>[
+          Expanded(
+            flex: 1,
+            child: Checkbox(
+                value: _isCompleted,
+                onChanged: (bool value) =>
+                    setState(() {
+                      _isCompleted = value;
+                    })),
+          ),
+          Expanded(
+            flex: 10,
+            child: Card(
+              elevation: 6.0,
+              child: Row(
+                children: <Widget>[
+                  Expanded(
+                    flex: 5,
+                    child: Padding(
+                      padding: const EdgeInsets.only(
+                        left: 8.0,
+                        top: 12.0,
+                        bottom: 12.0,
+                        right: 8.0,
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 8),
+                            child: Text(
+                              '${widget.title}',
+                              style: TextStyle(
+                                  color: Colors.blue[900], fontSize: 26),
+                            ),
+                          ),
+                          Text(
+                            '${widget.description}',
+                            style: TextStyle(
+                                color: Colors.black12, fontSize: 18),
+                            maxLines: 5,
+                          )
+                        ],
                       ),
                     ),
-                    Text(
-                      '$description',
-                      style: TextStyle(color: Colors.black12, fontSize: 18),
-                      maxLines: 5,
-                    )
-                  ],
-                ),
+                  ),
+                  Expanded(
+                    flex: 2,
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Icon(
+                            Icons.lens,
+                            color: Colors.red,
+                          ),
+                          Text(
+                            '${widget.date}',
+                            style: TextStyle(
+                              color: Colors.pink[400],
+                              fontSize: 16,
+                            ),
+                          ),
+                          Text(
+                            '${widget.time}',
+                            style: TextStyle(
+                              color: Colors.pink[400],
+                              fontSize: 16,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  )
+                ],
               ),
             ),
-            Expanded(
-              flex: 2,
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Icon(
-                      Icons.lens,
-                      color: Colors.red,
-                    ),
-                    Text(
-                      '$date',
-                      style: TextStyle(
-                        color: Colors.pink[400],
-                        fontSize: 16,
-                      ),
-                    ),
-                    Text(
-                      '$time',
-                      style: TextStyle(
-                        color: Colors.pink[400],
-                        fontSize: 16,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            )
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
