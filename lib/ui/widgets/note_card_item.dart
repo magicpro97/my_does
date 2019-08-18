@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class TodoCardItem extends StatefulWidget {
+class NoteCardItem extends StatefulWidget {
   final Key key;
   final String title;
   final String description;
@@ -9,7 +9,7 @@ class TodoCardItem extends StatefulWidget {
   final Color tagColor;
   final bool isCompleted;
 
-  TodoCardItem({
+  NoteCardItem({
     this.key,
     this.title,
     this.description,
@@ -20,10 +20,10 @@ class TodoCardItem extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _TodoCardItemState createState() => _TodoCardItemState();
+  _NoteCardItemState createState() => _NoteCardItemState();
 }
 
-class _TodoCardItemState extends State<TodoCardItem> {
+class _NoteCardItemState extends State<NoteCardItem> {
   bool _isCompleted;
 
   @override
@@ -80,8 +80,8 @@ class _TodoCardItemState extends State<TodoCardItem> {
                           ),
                           Text(
                             '${widget.description}',
-                            style: TextStyle(
-                                color: Colors.black12, fontSize: 18),
+                            style:
+                            TextStyle(color: Colors.black12, fontSize: 18),
                             maxLines: 5,
                           )
                         ],

@@ -1,18 +1,17 @@
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:flutter/material.dart';
-import 'package:my_does/data/models/todo.dart';
+import 'package:my_does/data/models/note.dart';
 import 'package:my_does/ui/home/home.dart';
 import 'package:my_does/utils/date_time_utils.dart';
+import 'package:uuid/uuid.dart';
 
 class InputScreen extends StatefulWidget {
   static String routeAddName = '/AddScreen';
   static String routeEditName = '/EditScreen';
 
-  final List<Todo> todoList;
-  final int index;
-  final String title;
+  final Note note;
 
-  InputScreen({this.title, this.todoList, this.index});
+  InputScreen({this.note});
 
   @override
   _InputScreenState createState() => _InputScreenState();
@@ -24,20 +23,18 @@ class _InputScreenState extends State<InputScreen> {
   final _dateController = TextEditingController();
   final _timeController = TextEditingController();
 
-  Todo _todo;
+  Note _note;
 
   @override
   void initState() {
-    _todo = widget.index == null
-        ? Todo(id: widget.todoList.length.toString(), title: '')
-        : widget.todoList[widget.index];
-    _titleController.text = _todo.title ?? '';
-    _descriptionController.text = _todo.description ?? '';
-    _dateController.text = _todo.date != null
-        ? DateTimeUtils.dateToString(_todo.date)
+    _note = widget.note ?? Note(id: Uuid().v1().toString());
+    _titleController.text = _note.title ?? '';
+    _descriptionController.text = _note.description ?? '';
+    _dateController.text = _note.date != null
+        ? DateTimeUtils.dateToString(_note.date)
         : DateTimeUtils.dateFormat.format(DateTime.now());
-    _timeController.text = _todo.time != null
-        ? DateTimeUtils.timeToString(_todo.time)
+    _timeController.text = _note.time != null
+        ? DateTimeUtils.timeToString(_note.time)
         : DateTimeUtils.timeFormat.format(DateTime.now());
     super.initState();
   }
@@ -72,7 +69,7 @@ class _InputScreenState extends State<InputScreen> {
   Widget _inputTile() {
     return Center(
         child: Text(
-          this.widget.title,
+          _note.title,
           style: TextStyle(fontSize: 24, color: Colors.white),
         ));
   }
@@ -156,14 +153,14 @@ class _InputScreenState extends State<InputScreen> {
                   height: 50.0,
                   child: RaisedButton(
                     onPressed: () {
-                      _todo.title = _titleController.text;
-                      _todo.description = _titleController.text;
-                      _todo.date =
+                      _note.title = _titleController.text;
+                      _note.description = _titleController.text;
+                      _note.date =
                           DateTimeUtils.dateFormat.parse(_dateController.text);
-                      _todo.time =
+                      _note.time =
                           DateTimeUtils.timeFormat.parse(_timeController.text);
-                      if (widget.index == null) {
-                        widget.todoList.add(_todo);
+                      if (_isCreateFrom()) {
+                        _addNewNoteAction(_note);
                       }
                       Navigator.pushNamedAndRemoveUntil(
                           context,
@@ -171,7 +168,7 @@ class _InputScreenState extends State<InputScreen> {
                               (Route<dynamic> route) => false);
                     },
                     child: Text(
-                      widget.index == null ? 'Create Now' : 'Update',
+                      _isCreateFrom() ? 'Create Now' : 'Update',
                       style: TextStyle(fontSize: 18),
                     ),
                     textColor: Colors.white,
@@ -197,4 +194,10 @@ class _InputScreenState extends State<InputScreen> {
       ),
     );
   }
+
+  bool _isCreateFrom() {
+    return widget.note == null ? false : true;
+  }
+
+  void _addNewNoteAction(Note note) {}
 }

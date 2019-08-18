@@ -26,6 +26,7 @@ dependencies:
   datetime_picker_formfield: ^0.4.2
   moor_flutter: ^1.6.0
   flutter_slidable: ^0.5.3
+  uuid: ^2.0.2
 
 dev_dependencies:
   flutter_test:

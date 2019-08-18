@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:my_does/data/models/note.dart';
 import 'package:my_does/data/models/tag.dart';
-import 'package:my_does/data/models/todo.dart';
 import 'package:my_does/ui/input/input.dart';
-import 'package:my_does/ui/widgets/todo_card_item.dart';
+import 'package:my_does/ui/widgets/note_card_item.dart';
 import 'package:my_does/utils/date_time_utils.dart';
 
 class HomeScreen extends StatefulWidget {
   static String routeName = '/HomeScreen';
-  final List<Todo> todoList;
 
-  HomeScreen({this.todoList});
+  HomeScreen();
 
   @override
   _HomeScreenState createState() => _HomeScreenState();
@@ -22,11 +21,11 @@ class _HomeScreenState extends State<HomeScreen> {
     Tag(name: "Red tags", color: Colors.red),
   ];
 
-  List<Todo> _todoList;
+  List<Note> _notes;
 
   @override
   void initState() {
-    _todoList = widget.todoList;
+    _notes = [];
     super.initState();
   }
 
@@ -113,50 +112,38 @@ class _HomeScreenState extends State<HomeScreen> {
     final SlidableController slidableController = SlidableController();
 
     return ListView.builder(
-      itemCount: this.widget.todoList != null ? this.widget.todoList.length : 0,
+      itemCount: _notes.length ?? 0,
       itemBuilder: (BuildContext context, int index) {
-        return GestureDetector(
-          onTap: () {
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) =>
-                        InputScreen(
-                          title: 'Edit the todo',
-                          todoList: this.widget.todoList,
-                          index: index,
-                        )));
-          },
-          child: Slidable(
-            controller: slidableController,
-            actionPane: SlidableDrawerActionPane(),
-            secondaryActions: <Widget>[
-              IconSlideAction(
-                  caption: 'Delete',
-                  color: Colors.red,
-                  icon: Icons.delete,
-                  onTap: () =>
-                      _deleteTodoAction(
-                          context, widget.todoList[index], index)),
-            ],
-            child: TodoCardItem(
-              key: Key(this.widget.todoList[index].id),
-              title: this.widget.todoList[index].title,
-              description: this.widget.todoList[index].description,
-              date:
-              DateTimeUtils.dateToString(this.widget.todoList[index].date),
-              time:
-              DateTimeUtils.timeToString(this.widget.todoList[index].time),
-            ),
+        return Slidable(
+          controller: slidableController,
+          actionPane: SlidableDrawerActionPane(),
+          secondaryActions: <Widget>[
+            IconSlideAction(
+                caption: 'Edit',
+                color: Colors.blue,
+                icon: Icons.edit,
+                onTap: () => _editTodoAction(context, _notes[index], index)),
+            IconSlideAction(
+                caption: 'Delete',
+                color: Colors.red,
+                icon: Icons.delete,
+                onTap: () => _deleteTodoAction(context, _notes[index], index)),
+          ],
+          child: NoteCardItem(
+            key: Key(_notes[index].id),
+            title: _notes[index].title,
+            description: _notes[index].description,
+            date: DateTimeUtils.dateToString(_notes[index].date),
+            time: DateTimeUtils.timeToString(_notes[index].time),
           ),
         );
       },
     );
   }
 
-  void _deleteTodoAction(BuildContext context, Todo todo, int index) {
+  void _deleteTodoAction(BuildContext context, Note todo, int index) {
     setState(() {
-      _todoList.remove(todo);
+      _notes.remove(todo);
     });
     Scaffold.of(context).showSnackBar(SnackBar(
       content: Text('Deleted'),
@@ -164,9 +151,13 @@ class _HomeScreenState extends State<HomeScreen> {
           label: 'Undo',
           onPressed: () {
             setState(() {
-              _todoList.insert(index, todo);
+              _notes.insert(index, todo);
             });
           }),
     ));
+  }
+
+  void _editTodoAction(BuildContext context, Note not, int index) {
+    Navigator.pushNamed(context, InputScreen.routeEditName);
   }
 }

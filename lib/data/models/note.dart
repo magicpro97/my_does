@@ -1,7 +1,7 @@
 import 'package:meta/meta.dart';
 import 'package:my_does/data/models/tag.dart';
 
-class Todo {
+class Note {
   String id;
   String title;
   String description;
@@ -9,8 +9,8 @@ class Todo {
   DateTime time;
   Tag tagName;
 
-  Todo({@required this.id,
-    @required this.title,
+  Note({@required this.id,
+    this.title,
     this.description,
     this.date,
     this.time,
