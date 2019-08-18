@@ -1,8 +1,9 @@
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:flutter/material.dart';
-import 'package:my_does/data/models/note.dart';
+import 'package:my_does/data/repositories/local/db.dart';
 import 'package:my_does/ui/home/home.dart';
 import 'package:my_does/utils/date_time_utils.dart';
+import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 
 class InputScreen extends StatefulWidget {
@@ -18,24 +19,29 @@ class InputScreen extends StatefulWidget {
 }
 
 class _InputScreenState extends State<InputScreen> {
-  final _titleController = TextEditingController();
-  final _descriptionController = TextEditingController();
-  final _dateController = TextEditingController();
-  final _timeController = TextEditingController();
-
-  Note _note;
+  var _titleController;
+  var _descriptionController;
+  var _dateController;
+  var _timeController;
 
   @override
   void initState() {
-    _note = widget.note ?? Note(id: Uuid().v1().toString());
-    _titleController.text = _note.title ?? '';
-    _descriptionController.text = _note.description ?? '';
-    _dateController.text = _note.date != null
-        ? DateTimeUtils.dateToString(_note.date)
-        : DateTimeUtils.dateFormat.format(DateTime.now());
-    _timeController.text = _note.time != null
-        ? DateTimeUtils.timeToString(_note.time)
-        : DateTimeUtils.timeFormat.format(DateTime.now());
+    final _note = widget.note ??
+        Note(
+            id: '0',
+            title: '',
+            description: '',
+            date: DateTime.now(),
+            time: DateTime.now(),
+            createdDate: DateTime.now(),
+            updatedDate: DateTime.now());
+    _titleController = TextEditingController(text: _note.title);
+    _descriptionController =
+        TextEditingController(text: _note.description);
+    _dateController =
+        TextEditingController(text: DateTimeUtils.dateToString(_note.date));
+    _timeController =
+        TextEditingController(text: DateTimeUtils.timeToString(_note.time));
     super.initState();
   }
 
@@ -69,7 +75,7 @@ class _InputScreenState extends State<InputScreen> {
   Widget _inputTile() {
     return Center(
         child: Text(
-          _note.title,
+          _isCreateFrom() ? "Create a new note" : "Update your note",
           style: TextStyle(fontSize: 24, color: Colors.white),
         ));
   }
@@ -152,21 +158,7 @@ class _InputScreenState extends State<InputScreen> {
                   width: double.infinity,
                   height: 50.0,
                   child: RaisedButton(
-                    onPressed: () {
-                      _note.title = _titleController.text;
-                      _note.description = _titleController.text;
-                      _note.date =
-                          DateTimeUtils.dateFormat.parse(_dateController.text);
-                      _note.time =
-                          DateTimeUtils.timeFormat.parse(_timeController.text);
-                      if (_isCreateFrom()) {
-                        _addNewNoteAction(_note);
-                      }
-                      Navigator.pushNamedAndRemoveUntil(
-                          context,
-                          HomeScreen.routeName,
-                              (Route<dynamic> route) => false);
-                    },
+                    onPressed: () => submitFormAction(context),
                     child: Text(
                       _isCreateFrom() ? 'Create Now' : 'Update',
                       style: TextStyle(fontSize: 18),
@@ -195,9 +187,29 @@ class _InputScreenState extends State<InputScreen> {
     );
   }
 
-  bool _isCreateFrom() {
-    return widget.note == null ? false : true;
+  void submitFormAction(BuildContext context) {
+    final noteDao = Provider
+        .of<MoorDatabase>(context)
+        .noteDao;
+    final _note = Note(
+      id: widget.note.id ?? Uuid().v1(),
+      title: _titleController.text,
+      description: _descriptionController.text,
+      date: DateTimeUtils.dateFormat.parse(_dateController.text),
+      time: DateTimeUtils.timeFormat.parse(_timeController.text),
+      createdDate: widget.note.createdDate ?? DateTime.now(),
+      updatedDate: DateTime.now(),
+    );
+    if (_isCreateFrom()) {
+      noteDao.insertNote(_note);
+    } else {
+      noteDao.updateNote(_note);
+    }
+    Navigator.pushNamedAndRemoveUntil(
+        context, HomeScreen.routeName, (Route<dynamic> route) => false);
   }
 
-  void _addNewNoteAction(Note note) {}
+  bool _isCreateFrom() {
+    return widget.note == null ? true : false;
+  }
 }

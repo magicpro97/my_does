@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:my_does/data/models/note.dart';
-import 'package:my_does/data/models/tag.dart';
+import 'package:my_does/data/repositories/local/daos/note_dao.dart';
+import 'package:my_does/data/repositories/local/db.dart';
 import 'package:my_does/ui/input/input.dart';
 import 'package:my_does/ui/widgets/note_card_item.dart';
 import 'package:my_does/utils/date_time_utils.dart';
+import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
   static String routeName = '/HomeScreen';
@@ -16,39 +17,50 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final List<Tag> _tags = [
-    Tag(name: "All tags"),
-    Tag(name: "Red tags", color: Colors.red),
-  ];
-
-  List<Note> _notes;
-
   @override
   void initState() {
-    _notes = [];
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
+    final moorDb = Provider.of<MoorDatabase>(context);
+    final noteDao = moorDb.noteDao;
+    final tagDao = moorDb.tagDao;
+
     return Scaffold(
-      body: DefaultTabController(
-        length: _tags.length,
-        child: Column(
-          children: <Widget>[
-            SizedBox(
-              height: 230.0,
-              child: _homeTitleWidget(),
-            ),
-            Expanded(
-              child: TabBarView(children: <Widget>[
-                _todoListWidget(),
-                _todoListWidget(),
-              ]),
-            )
-          ],
-        ),
-      ),
+      body: StreamBuilder<List<Tag>>(
+          stream: tagDao.watchTags(),
+          builder: (BuildContext context, AsyncSnapshot<List<Tag>> snapshot) {
+            final List<Tag> _tags = [
+              Tag(
+                  id: 0,
+                  name: 'All',
+                  color: Colors.white.value,
+                  createdDate: DateTime.now(),
+                  updatedDate: DateTime.now())
+            ];
+            if (snapshot.hasData) {
+              _tags.addAll(snapshot.data);
+            }
+            return DefaultTabController(
+              initialIndex: 0,
+              length: _tags.length,
+              child: Column(
+                children: <Widget>[
+                  SizedBox(
+                    height: 230.0,
+                    child: _homeTitleWidget(_tags),
+                  ),
+                  Expanded(
+                    child: TabBarView(children: <Widget>[
+                      ..._tags.map((tag) => _noteListWidget(noteDao)),
+                    ]),
+                  )
+                ],
+              ),
+            );
+          }),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.pushNamed(context, InputScreen.routeAddName);
@@ -58,7 +70,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _homeTitleWidget() {
+  Widget _homeTitleWidget(List<Tag> tags) {
     return Container(
         color: Colors.blue[900],
         child: Column(
@@ -92,12 +104,12 @@ class _HomeScreenState extends State<HomeScreen> {
                 unselectedLabelColor: Colors.white.withOpacity(0.3),
                 indicatorColor: Colors.white,
                 tabs: <Tab>[
-                  ..._tags.map((tag) =>
+                  ...tags.map((tag) =>
                       Tab(
                         child: Text(tag.name),
                         icon: Icon(
                           Icons.lens,
-                          color: tag.color,
+                          color: Color(tag.color),
                         ),
                       )),
                 ],
@@ -108,56 +120,67 @@ class _HomeScreenState extends State<HomeScreen> {
         ));
   }
 
-  Widget _todoListWidget() {
-    final SlidableController slidableController = SlidableController();
+  Widget _noteListWidget(NoteDao noteDao) {
+    return StreamBuilder<List<Note>>(
+        stream: noteDao.watchNotes(),
+        builder: (BuildContext context, AsyncSnapshot<List<Note>> snapshot) {
+          List<Note> _notes;
+          if (snapshot.hasData) {
+            _notes = snapshot.data;
+          } else {
+            _notes = [];
+          }
 
-    return ListView.builder(
-      itemCount: _notes.length ?? 0,
-      itemBuilder: (BuildContext context, int index) {
-        return Slidable(
-          controller: slidableController,
-          actionPane: SlidableDrawerActionPane(),
-          secondaryActions: <Widget>[
-            IconSlideAction(
-                caption: 'Edit',
-                color: Colors.blue,
-                icon: Icons.edit,
-                onTap: () => _editTodoAction(context, _notes[index], index)),
-            IconSlideAction(
-                caption: 'Delete',
-                color: Colors.red,
-                icon: Icons.delete,
-                onTap: () => _deleteTodoAction(context, _notes[index], index)),
-          ],
-          child: NoteCardItem(
-            key: Key(_notes[index].id),
-            title: _notes[index].title,
-            description: _notes[index].description,
-            date: DateTimeUtils.dateToString(_notes[index].date),
-            time: DateTimeUtils.timeToString(_notes[index].time),
-          ),
-        );
-      },
-    );
+          return ListView.builder(
+            itemCount: _notes.length,
+            itemBuilder: (BuildContext context, int index) {
+              return Slidable(
+                controller: SlidableController(),
+                actionPane: SlidableDrawerActionPane(),
+                secondaryActions: <Widget>[
+                  IconSlideAction(
+                      caption: 'Edit',
+                      color: Colors.blue,
+                      icon: Icons.edit,
+                      onTap: () => _editNoteAction(context, _notes[index])),
+                  IconSlideAction(
+                      caption: 'Delete',
+                      color: Colors.red,
+                      icon: Icons.delete,
+                      onTap: () =>
+                          _deleteNoteAction(
+                              context, noteDao, _notes[index], index)),
+                ],
+                child: NoteCardItem(
+                  key: Key(_notes[index].id),
+                  title: _notes[index].title,
+                  description: _notes[index].description,
+                  date: DateTimeUtils.dateToString(_notes[index].date),
+                  time: DateTimeUtils.timeToString(_notes[index].time),
+                ),
+              );
+            },
+          );
+        });
   }
 
-  void _deleteTodoAction(BuildContext context, Note todo, int index) {
-    setState(() {
-      _notes.remove(todo);
-    });
+  void _deleteNoteAction(BuildContext context, NoteDao noteDao, Note note,
+      int index) {
+    noteDao.deleteNote(note);
     Scaffold.of(context).showSnackBar(SnackBar(
-      content: Text('Deleted'),
-      action: SnackBarAction(
-          label: 'Undo',
-          onPressed: () {
-            setState(() {
-              _notes.insert(index, todo);
-            });
-          }),
-    ));
+        content: Text('Deleted'),
+        action: SnackBarAction(
+            label: 'Undo', onPressed: () => noteDao.insertNote(note))));
   }
 
-  void _editTodoAction(BuildContext context, Note not, int index) {
-    Navigator.pushNamed(context, InputScreen.routeEditName);
+  void _editNoteAction(BuildContext context, Note note) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+          builder: (_) =>
+              InputScreen(
+                note: note,
+              )),
+    );
   }
 }
