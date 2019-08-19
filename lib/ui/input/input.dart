@@ -56,27 +56,32 @@ class _InputScreenState extends State<InputScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        appBar: AppBar(
+          backgroundColor: Colors.blue[900],
+          centerTitle: true,
+          title: _inputTile(),
+        ),
         body: Stack(children: <Widget>[
           Container(
-              height: 220,
-              color: Colors.blue[900],
-              child: Padding(
-                padding: const EdgeInsets.only(top: 30.0),
-                child: _inputTile(),
-              )),
+            height: 220,
+            width: double.infinity,
+            color: Colors.blue[900],
+          ),
           Container(
-            margin: const EdgeInsets.only(top: 150),
+            margin: const EdgeInsets.only(top: 20),
             child: _input(),
           )
         ]));
   }
 
   Widget _inputTile() {
-    return Center(
-        child: Text(
-          _isCreateFrom() ? "Create a new note" : "Update your note",
-          style: TextStyle(fontSize: 24, color: Colors.white),
-        ));
+    return Text(
+      _isCreateFrom() ? "Create a new note" : "Update your note",
+      style: TextStyle(
+        fontSize: 24,
+        color: Colors.white,
+      ),
+    );
   }
 
   Widget _input() {
@@ -95,61 +100,31 @@ class _InputScreenState extends State<InputScreen> {
                 padding: const EdgeInsets.all(16.0),
                 child: TextFormField(
                   controller: _titleController,
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                  ),
                   decoration: InputDecoration(
-                      labelText: 'Add Title',
-                      hintText: 'What you do?',
-                      border: OutlineInputBorder()),
+                    labelText: 'Title',
+                    helperText: 'What you do?',
+                    suffixIcon: Icon(Icons.edit),
+                  ),
                 ),
               ),
               Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: TextFormField(
                   controller: _descriptionController,
+                  maxLines: 3,
                   decoration: InputDecoration(
-                      labelText: 'Description',
-                      hintText: 'How to?',
-                      border: OutlineInputBorder()),
+                    labelText: 'Description',
+                    hintText: 'How to?',
+                    suffixIcon: Icon(Icons.note),
+                  ),
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: DateTimeField(
-                  format: DateTimeUtils.dateFormat,
-                  controller: _dateController,
-                  decoration: InputDecoration(
-                      labelText: 'Date',
-                      hintText: 'When will?',
-                      border: OutlineInputBorder()),
-                  onShowPicker:
-                      (BuildContext context, DateTime currentValue) async {
-                    return showDatePicker(
-                      context: context,
-                      firstDate: DateTime(1900),
-                      initialDate: currentValue ?? DateTime.now(),
-                      lastDate: DateTime(2100),
-                    );
-                  },
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: DateTimeField(
-                  format: DateTimeUtils.timeFormat,
-                  controller: _timeController,
-                  decoration: InputDecoration(
-                      labelText: 'Time',
-                      hintText: 'What time?',
-                      border: OutlineInputBorder()),
-                  onShowPicker:
-                      (BuildContext context, DateTime currentValue) async {
-                    final time = await showTimePicker(
-                      context: context,
-                      initialTime: TimeOfDay.fromDateTime(
-                          currentValue ?? DateTime.now()),
-                    );
-                    return DateTimeField.convert(time);
-                  },
-                ),
+                padding: const EdgeInsets.all(8.0),
+                child: _dateTimeField(),
               ),
               Padding(
                 padding: const EdgeInsets.all(16.0),
@@ -183,6 +158,59 @@ class _InputScreenState extends State<InputScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _dateTimeField() {
+    return Row(
+      children: <Widget>[
+        Expanded(
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: DateTimeField(
+              format: DateTimeUtils.dateFormat,
+              controller: _dateController,
+              decoration: InputDecoration(
+                labelText: 'Date',
+                hintText: 'When will?',
+                prefixIcon: Icon(Icons.date_range),
+              ),
+              onShowPicker:
+                  (BuildContext context, DateTime currentValue) async {
+                return showDatePicker(
+                  context: context,
+                  firstDate: DateTime(1900),
+                  initialDate: currentValue ?? DateTime.now(),
+                  lastDate: DateTime(2100),
+                );
+              },
+            ),
+          ),
+        ),
+        Expanded(
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: DateTimeField(
+              format: DateTimeUtils.timeFormat,
+              controller: _timeController,
+              decoration: InputDecoration(
+                labelText: 'Time',
+                hintText: 'What time?',
+                prefixIcon: Icon(Icons.timer),
+              ),
+              onShowPicker:
+                  (BuildContext context, DateTime currentValue) async {
+                final time = await showTimePicker(
+                  context: context,
+                  initialTime:
+                  TimeOfDay.fromDateTime(currentValue ?? DateTime.now()),
+                );
+                return DateTimeField.convert(time);
+              },
+            ),
+          ),
+        ),
+      ],
     );
   }
 
