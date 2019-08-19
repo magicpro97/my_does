@@ -19,37 +19,40 @@ class InputScreen extends StatefulWidget {
 }
 
 class _InputScreenState extends State<InputScreen> {
-  var _titleController;
-  var _descriptionController;
-  var _dateController;
-  var _timeController;
+  String title;
+  String description;
+  String date;
+  String time;
+  GlobalKey<FormState> formKey;
+  bool autoValidate;
+  FocusNode descriptionNote;
 
   @override
   void initState() {
-    final _note = widget.note ??
-        Note(
-            id: '0',
-            title: '',
-            description: '',
-            date: DateTime.now(),
-            time: DateTime.now(),
-            createdDate: DateTime.now(),
-            updatedDate: DateTime.now());
-    _titleController = TextEditingController(text: _note.title);
-    _descriptionController = TextEditingController(text: _note.description);
-    _dateController =
-        TextEditingController(text: DateTimeUtils.dateToString(_note.date));
-    _timeController =
-        TextEditingController(text: DateTimeUtils.timeToString(_note.time));
+    formKey = GlobalKey<FormState>();
+    autoValidate = false;
+    descriptionNote = FocusNode();
+    if (widget.note == null) {
+      title = '';
+      description = '';
+      date = DateTimeUtils.dateToString(DateTime.now());
+      time = DateTimeUtils.timeToString(DateTime.now());
+    } else {
+      final note = widget.note;
+      title = note.title;
+      description = note.description;
+      date = DateTimeUtils.dateToString(note.date);
+      time = DateTimeUtils.timeToString(note.time);
+    }
     super.initState();
   }
 
   @override
   void dispose() {
-    _titleController.dispose();
-    _descriptionController.dispose();
-    _dateController.dispose();
-    _timeController.dispose();
+//    _titleController.dispose();
+//    _descriptionController.dispose();
+//    _dateController.dispose();
+//    _timeController.dispose();
     super.dispose();
   }
 
@@ -63,7 +66,7 @@ class _InputScreenState extends State<InputScreen> {
         ),
         body: Stack(children: <Widget>[
           Container(
-            height: 220,
+            height: 180,
             width: double.infinity,
             color: Colors.blue[900],
           ),
@@ -87,157 +90,219 @@ class _InputScreenState extends State<InputScreen> {
   Widget _input() {
     return Container(
       height: double.infinity,
-      margin: EdgeInsets.only(left: 8.0, right: 8.0),
+      margin: EdgeInsets.symmetric(horizontal: 8.0),
       child: Card(
-        shape:
-        RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.0)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16.0),
+        ),
         child: SingleChildScrollView(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: <Widget>[
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: TextFormField(
-                  controller: _titleController,
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                  ),
-                  decoration: InputDecoration(
-                    labelText: 'Title',
-                    helperText: 'What you do?',
-                    suffixIcon: Icon(Icons.edit),
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: TextFormField(
-                  controller: _descriptionController,
-                  maxLines: 3,
-                  decoration: InputDecoration(
-                    labelText: 'Description',
-                    hintText: 'How to?',
-                    suffixIcon: Icon(Icons.note),
+          child: Form(
+            key: formKey,
+            autovalidate: autoValidate,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: <Widget>[
+                _buildTitleField(),
+                _buildDescriptionField(),
+                _buildDateField(),
+                _buildTimeField(),
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: SizedBox(
+                    width: double.infinity,
+                    height: 50.0,
+                    child: RaisedButton(
+                      onPressed: () => submitFormAction(context),
+                      child: Text(
+                        _isCreateFrom() ? 'Create' : 'Update',
+                        style: TextStyle(fontSize: 18),
+                      ),
+                      textColor: Colors.white,
+                      color: Colors.pink,
+                    ),
                   ),
                 ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: _dateTimeField(),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: SizedBox(
-                  width: double.infinity,
-                  height: 50.0,
-                  child: RaisedButton(
-                    onPressed: () => submitFormAction(context),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: FlatButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
                     child: Text(
-                      _isCreateFrom() ? 'Create Now' : 'Update',
+                      'Cancel',
                       style: TextStyle(fontSize: 18),
                     ),
-                    textColor: Colors.white,
-                    color: Colors.pink,
                   ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: FlatButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  child: Text(
-                    'Cancel',
-                    style: TextStyle(fontSize: 18),
-                  ),
-                ),
-              )
-            ],
+                )
+              ],
+            ),
           ),
         ),
       ),
     );
   }
 
-  Widget _dateTimeField() {
-    return Row(
-      children: <Widget>[
-        Expanded(
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: DateTimeField(
-              format: DateTimeUtils.dateFormat,
-              controller: _dateController,
-              decoration: InputDecoration(
-                labelText: 'Date',
-                hintText: 'When will?',
-                prefixIcon: Icon(Icons.date_range),
-              ),
-              onShowPicker:
-                  (BuildContext context, DateTime currentValue) async {
-                return showDatePicker(
-                  context: context,
-                  firstDate: DateTime(1900),
-                  initialDate: currentValue ?? DateTime.now(),
-                  lastDate: DateTime(2100),
-                );
-              },
-            ),
-          ),
+  Padding _buildDescriptionField() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+        horizontal: 16.0,
+      ),
+      child: TextFormField(
+        focusNode: descriptionNote,
+        initialValue: description,
+        minLines: 1,
+        maxLines: 3,
+        maxLength: 255,
+        textInputAction: TextInputAction.next,
+        decoration: InputDecoration(
+          labelText: 'Description',
+          hintText: 'How to?',
+          prefixIcon: Icon(Icons.note),
         ),
-        Expanded(
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: DateTimeField(
-              format: DateTimeUtils.timeFormat,
-              controller: _timeController,
-              decoration: InputDecoration(
-                labelText: 'Time',
-                hintText: 'What time?',
-                prefixIcon: Icon(Icons.timer),
-              ),
-              onShowPicker:
-                  (BuildContext context, DateTime currentValue) async {
-                final time = await showTimePicker(
-                  context: context,
-                  initialTime:
-                  TimeOfDay.fromDateTime(currentValue ?? DateTime.now()),
-                );
-                return DateTimeField.convert(time);
-              },
-            ),
-          ),
+        onSaved: (String value) => description = value,
+        onFieldSubmitted: (_) {
+          FocusScope.of(context).requestFocus(FocusNode());
+        },
+      ),
+    );
+  }
+
+  Padding _buildTitleField() {
+    final titleNode = FocusNode();
+
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: TextFormField(
+        focusNode: titleNode,
+        initialValue: title,
+        validator: (String value) => _validateTitle(value),
+        maxLength: 20,
+        textInputAction: TextInputAction.next,
+        onSaved: (String value) => title = value,
+        onFieldSubmitted: (_) {
+          titleNode.unfocus();
+          FocusScope.of(context).requestFocus(descriptionNote);
+        },
+        style: TextStyle(
+          fontWeight: FontWeight.bold,
         ),
-      ],
+        decoration: InputDecoration(
+          labelText: 'Title*',
+          helperText: 'What you do?',
+          prefixIcon: Icon(Icons.edit),
+        ),
+      ),
+    );
+  }
+
+  String _validateTitle(String value) {
+    if (value.isEmpty) {
+      return 'Please type something for your title!';
+    }
+    return null;
+  }
+
+  Widget _buildTimeField() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+        vertical: 8.0,
+        horizontal: 16.0,
+      ),
+      child: DateTimeField(
+        format: DateTimeUtils.timeFormat,
+        initialValue: DateTimeUtils.timeFormat.parse(time),
+        validator: (DateTime value) => _validateTime(value),
+        decoration: InputDecoration(
+          labelText: 'Time',
+          hintText: 'What time?',
+          prefixIcon: Icon(Icons.timer),
+        ),
+        onShowPicker: (BuildContext context, DateTime currentValue) async {
+          final time = await showTimePicker(
+            context: context,
+            initialTime: TimeOfDay.fromDateTime(currentValue ?? DateTime.now()),
+          );
+          return DateTimeField.convert(time);
+        },
+      ),
+    );
+  }
+
+  Widget _buildDateField() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+        vertical: 8.0,
+        horizontal: 16.0,
+      ),
+      child: DateTimeField(
+        validator: (DateTime value) => _validateDate(value),
+        format: DateTimeUtils.dateFormat,
+        initialValue: DateTimeUtils.dateFormat.parse(date),
+        decoration: InputDecoration(
+          labelText: 'Date',
+          hintText: 'When will?',
+          prefixIcon: Icon(Icons.date_range),
+        ),
+        onShowPicker: (BuildContext context, DateTime currentValue) {
+          return showDatePicker(
+            context: context,
+            firstDate: DateTime(1900),
+            initialDate: currentValue ?? DateTime.now(),
+            lastDate: DateTime(2100),
+          );
+        },
+      ),
     );
   }
 
   void submitFormAction(BuildContext context) {
-    final noteDao = Provider
-        .of<MoorDatabase>(context)
-        .noteDao;
-    final _note = Note(
-      id: widget.note != null ? widget.note.id : Uuid().v1(),
-      title: _titleController.text,
-      description: _descriptionController.text,
-      date: DateTimeUtils.dateFormat.parse(_dateController.text),
-      time: DateTimeUtils.timeFormat.parse(_timeController.text),
-      createdDate:
-      widget.note != null ? widget.note.createdDate : DateTime.now(),
-      updatedDate: DateTime.now(),
-    );
-    if (_isCreateFrom()) {
-      noteDao.insertNote(_note);
+    if (formKey.currentState.validate()) {
+      formKey.currentState.save();
+      final noteDao = Provider
+          .of<MoorDatabase>(context)
+          .noteDao;
+      final _note = Note(
+        id: widget.note != null ? widget.note.id : Uuid().v1(),
+        title: title,
+        description: description,
+        date: DateTimeUtils.dateFormat.parse(date),
+        time: DateTimeUtils.timeFormat.parse(time),
+        createdDate:
+        widget.note != null ? widget.note.createdDate : DateTime.now(),
+        updatedDate: DateTime.now(),
+      );
+      if (_isCreateFrom()) {
+        noteDao.insertNote(_note);
+      } else {
+        noteDao.updateNote(_note);
+      }
+      Navigator.pushNamedAndRemoveUntil(
+          context, HomeScreen.routeName, (Route<dynamic> route) => false);
     } else {
-      noteDao.updateNote(_note);
+      setState(() => autoValidate = true);
     }
-    Navigator.pushNamedAndRemoveUntil(
-        context, HomeScreen.routeName, (Route<dynamic> route) => false);
   }
 
   bool _isCreateFrom() {
     return widget.note == null ? true : false;
+  }
+
+  String _validateDate(DateTime value) {
+    try {
+      DateTimeUtils.dateToString(value);
+    } catch (Exception) {
+      return 'Wrong date format. Should be dd-MM-yy';
+    }
+    return null;
+  }
+
+  String _validateTime(DateTime value) {
+    try {
+      DateTimeUtils.timeToString(value);
+    } catch (Exception) {
+      return 'Wrong time format. Should be hh:mm';
+    }
+    return null;
   }
 }
