@@ -36,8 +36,7 @@ class _InputScreenState extends State<InputScreen> {
             createdDate: DateTime.now(),
             updatedDate: DateTime.now());
     _titleController = TextEditingController(text: _note.title);
-    _descriptionController =
-        TextEditingController(text: _note.description);
+    _descriptionController = TextEditingController(text: _note.description);
     _dateController =
         TextEditingController(text: DateTimeUtils.dateToString(_note.date));
     _timeController =
@@ -192,12 +191,13 @@ class _InputScreenState extends State<InputScreen> {
         .of<MoorDatabase>(context)
         .noteDao;
     final _note = Note(
-      id: widget.note.id ?? Uuid().v1(),
+      id: widget.note ?? Uuid().v1(),
       title: _titleController.text,
       description: _descriptionController.text,
       date: DateTimeUtils.dateFormat.parse(_dateController.text),
       time: DateTimeUtils.timeFormat.parse(_timeController.text),
-      createdDate: widget.note.createdDate ?? DateTime.now(),
+      createdDate:
+      widget.note != null ? widget.note.createdDate : DateTime.now(),
       updatedDate: DateTime.now(),
     );
     if (_isCreateFrom()) {
