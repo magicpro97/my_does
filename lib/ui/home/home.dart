@@ -4,7 +4,6 @@ import 'package:my_does/data/repositories/local/daos/note_dao.dart';
 import 'package:my_does/data/repositories/local/db.dart';
 import 'package:my_does/ui/input/input.dart';
 import 'package:my_does/ui/widgets/note_card_item.dart';
-import 'package:my_does/utils/date_time_utils.dart';
 import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -54,7 +53,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   Expanded(
                     child: TabBarView(children: <Widget>[
-                      ..._tags.map((tag) => _noteListWidget(noteDao)),
+                      ..._tags.map((tag) => _noteListWidget(noteDao, _tags)),
                     ]),
                   )
                 ],
@@ -120,7 +119,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ));
   }
 
-  Widget _noteListWidget(NoteDao noteDao) {
+  Widget _noteListWidget(NoteDao noteDao, List<Tag> tags) {
     return StreamBuilder<List<Note>>(
         stream: noteDao.watchNotes(),
         builder: (BuildContext context, AsyncSnapshot<List<Note>> snapshot) {
@@ -152,11 +151,10 @@ class _HomeScreenState extends State<HomeScreen> {
                               context, noteDao, _notes[index], index)),
                 ],
                 child: NoteCardItem(
-                  key: Key(_notes[index].id),
-                  title: _notes[index].title,
-                  description: _notes[index].description,
-                  date: DateTimeUtils.dateToString(_notes[index].date),
-                  time: DateTimeUtils.timeToString(_notes[index].time),
+                  note: _notes[index],
+                  tag: tags.firstWhere(
+                          (tag) => (tag.name ?? '') == _notes[index].tagName,
+                      orElse: () => null),
                 ),
               );
             },

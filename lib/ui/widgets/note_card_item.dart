@@ -1,21 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:my_does/data/repositories/local/db.dart';
+import 'package:my_does/utils/date_time_utils.dart';
 
 class NoteCardItem extends StatefulWidget {
-  final Key key;
-  final String title;
-  final String description;
-  final String date;
-  final String time;
-  final Color tagColor;
+  final Note note;
+  final Tag tag;
 
-  NoteCardItem({
-    this.key,
-    this.title,
-    this.description,
-    this.date,
-    this.time,
-    this.tagColor,
-  }) : super(key: key);
+  NoteCardItem({this.note, this.tag});
 
   @override
   _NoteCardItemState createState() => _NoteCardItemState();
@@ -29,6 +20,9 @@ class _NoteCardItemState extends State<NoteCardItem> {
 
   @override
   Widget build(BuildContext context) {
+    final _note = widget.note;
+    final _tag = widget.tag;
+
     return Container(
       height: 140.0,
       margin: EdgeInsets.only(bottom: 16.0),
@@ -55,12 +49,12 @@ class _NoteCardItemState extends State<NoteCardItem> {
                     Padding(
                       padding: const EdgeInsets.only(bottom: 8),
                       child: Text(
-                        '${widget.title}',
+                        '${_note.title}',
                         style: TextStyle(color: Colors.blue[900], fontSize: 26),
                       ),
                     ),
                     Text(
-                      '${widget.description}',
+                      '${_note.description}',
                       style: TextStyle(color: Colors.black12, fontSize: 18),
                       maxLines: 5,
                     )
@@ -75,19 +69,16 @@ class _NoteCardItemState extends State<NoteCardItem> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                    Icon(
-                      Icons.lens,
-                      color: Colors.red,
-                    ),
+                    _tag != null ? _buildTag(_tag) : _buildNoTag(),
                     Text(
-                      '${widget.date}',
+                      '${DateTimeUtils.dateToString(_note.date)}',
                       style: TextStyle(
                         color: Colors.pink[400],
                         fontSize: 16,
                       ),
                     ),
                     Text(
-                      '${widget.time}',
+                      '${DateTimeUtils.timeToString(_note.time)}',
                       style: TextStyle(
                         color: Colors.pink[400],
                         fontSize: 16,
@@ -100,6 +91,36 @@ class _NoteCardItemState extends State<NoteCardItem> {
           ],
         ),
       ),
+    );
+  }
+
+  Row _buildTag(Tag _tag) {
+    return Row(
+      children: <Widget>[
+        Icon(
+          Icons.lens,
+          color: Color(_tag.color),
+        ),
+        Text(
+          _tag.name,
+          style: TextStyle(color: Color(_tag.color), fontSize: 16),
+        ),
+      ],
+    );
+  }
+
+  Row _buildNoTag() {
+    return Row(
+      children: <Widget>[
+        Icon(
+          Icons.lens,
+          color: Colors.grey,
+        ),
+        Text(
+          'No tag',
+          style: TextStyle(color: Colors.grey, fontSize: 16),
+        ),
+      ],
     );
   }
 }

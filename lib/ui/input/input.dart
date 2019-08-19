@@ -191,7 +191,7 @@ class _InputScreenState extends State<InputScreen> {
         .of<MoorDatabase>(context)
         .noteDao;
     final _note = Note(
-      id: widget.note ?? Uuid().v1(),
+      id: widget.note != null ? widget.note.id : Uuid().v1(),
       title: _titleController.text,
       description: _descriptionController.text,
       date: DateTimeUtils.dateFormat.parse(_dateController.text),
