@@ -34,7 +34,12 @@ class _NoteCardItemState extends State<NoteCardItem> {
         child: Row(
           children: <Widget>[
             Expanded(
-              flex: 5,
+              child: Container(
+                color: _tag != null ? Color(_tag.color) : Colors.grey,
+              ),
+            ),
+            Expanded(
+              flex: 10,
               child: Padding(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 8.0,
@@ -44,30 +49,37 @@ class _NoteCardItemState extends State<NoteCardItem> {
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 8),
-                      child: Text(
-                        '${_note.title}',
-                        style: TextStyle(color: Colors.blue[900], fontSize: 26),
+                    Container(
+                      width: 300.0,
+                      child: Padding(
+                        padding: const EdgeInsets.only(bottom: 8),
+                        child: Text(
+                          '${_note.title}',
+                          style:
+                          TextStyle(color: Colors.blue[900], fontSize: 26),
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ),
                     ),
-                    Text(
-                      '${_note.description}',
-                      style: TextStyle(color: Colors.black12, fontSize: 18),
-                      maxLines: 5,
+                    Container(
+                      width: 300.0,
+                      child: Text(
+                        '${_note.description}',
+                        style: TextStyle(color: Colors.black12, fontSize: 18),
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     )
                   ],
                 ),
               ),
             ),
             Expanded(
-              flex: 2,
+              flex: 3,
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                    _tag != null ? _buildTag(_tag) : _buildNoTag(),
                     Text(
                       '${DateTimeUtils.dateToString(_note.date)}',
                       style: TextStyle(
@@ -89,36 +101,6 @@ class _NoteCardItemState extends State<NoteCardItem> {
           ],
         ),
       ),
-    );
-  }
-
-  Row _buildTag(Tag _tag) {
-    return Row(
-      children: <Widget>[
-        Icon(
-          Icons.lens,
-          color: Color(_tag.color),
-        ),
-        Text(
-          _tag.name,
-          style: TextStyle(color: Color(_tag.color), fontSize: 16),
-        ),
-      ],
-    );
-  }
-
-  Row _buildNoTag() {
-    return Row(
-      children: <Widget>[
-        Icon(
-          Icons.lens,
-          color: Colors.grey,
-        ),
-        Text(
-          'No tag',
-          style: TextStyle(color: Colors.grey, fontSize: 16),
-        ),
-      ],
     );
   }
 }

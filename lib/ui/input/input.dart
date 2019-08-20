@@ -48,15 +48,6 @@ class _InputScreenState extends State<InputScreen> {
   }
 
   @override
-  void dispose() {
-//    _titleController.dispose();
-//    _descriptionController.dispose();
-//    _dateController.dispose();
-//    _timeController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
