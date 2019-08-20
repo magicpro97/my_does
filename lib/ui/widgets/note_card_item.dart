@@ -39,7 +39,7 @@ class _NoteCardItemState extends State<NoteCardItem> {
               ),
             ),
             Expanded(
-              flex: 10,
+              flex: 9,
               child: Padding(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 8.0,
@@ -74,7 +74,7 @@ class _NoteCardItemState extends State<NoteCardItem> {
               ),
             ),
             Expanded(
-              flex: 3,
+              flex: 4,
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Column(

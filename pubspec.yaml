@@ -28,6 +28,7 @@ dependencies:
   flutter_slidable: ^0.5.3
   uuid: ^2.0.2
   provider: ^3.0.0+1
+  flutter_colorpicker: ^0.2.6
 
 dev_dependencies:
   flutter_test:
