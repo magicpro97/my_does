@@ -1,38 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/block_picker.dart';
 
-class TagForm extends StatelessWidget {
-  final String title;
+class TagForm extends StatefulWidget {
+  final String tagName;
+  final Color color;
 
-  TagForm({this.title});
+  TagForm({Key key, this.tagName, this.color}) : super(key: key);
+
+  @override
+  _TagFormState createState() => _TagFormState();
+}
+
+class _TagFormState extends State<TagForm> {
+  String tagName;
+  Color color;
+
+  @override
+  void initState() {
+    tagName = widget.tagName;
+    color = widget.color;
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
-    String tagName;
-    Color color;
-
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: <Widget>[
-        Container(
-            width: double.infinity,
-            decoration: BoxDecoration(color: Colors.blue[900]),
-            child: Center(
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text(
-                  title,
-                  style: TextStyle(color: Colors.white, fontSize: 20.0),
-                ),
-              ),
-            )),
-        Divider(),
-        _buildTagForm(tagName, context, color),
-      ],
-    );
-  }
-
-  Widget _buildTagForm(String tagName, BuildContext context, Color color) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Row(
@@ -54,30 +45,45 @@ class TagForm extends StatelessWidget {
           ),
           Expanded(
               child: InkWell(
-            child: Container(
-              child: Icon(
-                Icons.color_lens,
-                color: Colors.white,
-              ),
-              decoration:
-                  BoxDecoration(shape: BoxShape.circle, color: Colors.pink),
-            ),
-            onTap: () => showDialog(
-              context: context,
-              builder: (context) => _buildColorPickerDialog(color, context),
-            ),
-          ))
+                child: Container(
+                  height: 32.0,
+                  width: 32.0,
+                  child: Icon(
+                    Icons.color_lens,
+                    color: Colors.white,
+                  ),
+                  decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: color,
+                      gradient: color == null
+                          ? SweepGradient(colors: Colors.primaries)
+                          : null),
+                ),
+                onTap: () =>
+                    showDialog(
+                      context: context,
+                      builder: (context) =>
+                          _buildColorPickerDialog(color, context),
+                    ).then((value) =>
+                        setState(() {
+                          color = value;
+                        })),
+              ))
         ],
       ),
     );
   }
 
   Widget _buildColorPickerDialog(Color color, BuildContext context) {
+    void _chooseColorDoneAction(Color color) {
+      Navigator.pop(context, color);
+    }
+
     return AlertDialog(
       title: Text('Choose your color'),
       content: SingleChildScrollView(
         child: BlockPicker(
-          pickerColor: Colors.red,
+          pickerColor: color,
           onColorChanged: (value) {
             color = value;
           },
@@ -85,7 +91,7 @@ class TagForm extends StatelessWidget {
       ),
       actions: <Widget>[
         RaisedButton(
-          onPressed: () => Navigator.pop(context),
+          onPressed: () => _chooseColorDoneAction(color),
           child: Text(
             "Done",
             style: TextStyle(color: Colors.white),

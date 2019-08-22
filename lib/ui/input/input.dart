@@ -2,8 +2,8 @@ import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:flutter/material.dart';
 import 'package:my_does/data/repositories/local/db.dart';
 import 'package:my_does/ui/home/home.dart';
+import 'package:my_does/ui/widgets/input_tag_dialog.dart';
 import 'package:my_does/ui/widgets/tag_chip_item.dart';
-import 'package:my_does/ui/widgets/tag_form.dart';
 import 'package:my_does/utils/date_time_utils.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
@@ -365,28 +365,7 @@ class _InputScreenState extends State<InputScreen> {
   void _buildCreateNewTagDialog() {
     showDialog(
       context: context,
-      builder: (context) =>
-          AlertDialog(
-            contentPadding: EdgeInsets.all(0.0),
-            titlePadding: EdgeInsets.all(0.0),
-            backgroundColor: Colors.white,
-            elevation: 8.0,
-            content: TagForm(
-              title: 'Create a new tag!',
-            ),
-            actions: <Widget>[
-              FlatButton(
-                onPressed: () => Navigator.pop(context),
-                child: Text(
-                  "Done",
-                  style: TextStyle(
-                    color: Colors.blue[900],
-                    fontSize: 16.0,
-                  ),
-                ),
-              )
-            ],
-          ),
+      builder: (context) => InputTagDialog(title: 'Create a new tag'),
     );
   }
 }
