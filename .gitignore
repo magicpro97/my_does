@@ -70,3 +70,11 @@
 !**/ios/**/default.pbxuser
 !**/ios/**/default.perspectivev3
 !/packages/flutter_tools/test/data/dart_dependencies_test/**/.packages
+
+# App
+lib/data/repositories/local/db.g.dart
+lib/data/repositories/local/daos/note_dao.g.dart
+lib/data/repositories/local/daos/tag_dao.g.dart
+gen/
+ios/Flutter/flutter_export_environment.sh
+lib/ui/base/
