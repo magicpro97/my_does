@@ -2,7 +2,7 @@ import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:flutter/material.dart';
 import 'package:my_does/data/repositories/local/db.dart';
 import 'package:my_does/ui/home/home.dart';
-import 'package:my_does/ui/widgets/input_tag_dialog.dart';
+import 'package:my_does/ui/input/tag_field.dart';
 import 'package:my_does/ui/widgets/tag_chip_item.dart';
 import 'package:my_does/utils/date_time_utils.dart';
 import 'package:provider/provider.dart';
@@ -27,6 +27,7 @@ class _InputScreenState extends State<InputScreen> {
   String time;
   GlobalKey<FormState> formKey;
   bool autoValidate;
+  TagChipItem tagChipItem;
   FocusNode descriptionNote;
 
   @override
@@ -46,6 +47,7 @@ class _InputScreenState extends State<InputScreen> {
       date = DateTimeUtils.dateToString(note.date);
       time = DateTimeUtils.timeToString(note.time);
     }
+    tagChipItem = TagChipItem();
     super.initState();
   }
 
@@ -57,17 +59,20 @@ class _InputScreenState extends State<InputScreen> {
           centerTitle: true,
           title: _inputTile(),
         ),
-        body: Stack(children: <Widget>[
-          Container(
-            height: 180,
-            width: double.infinity,
-            color: Colors.blue[900],
-          ),
-          Container(
-            margin: const EdgeInsets.only(top: 20),
-            child: _input(),
-          )
-        ]));
+        body: Builder(
+          builder: (BuildContext context) =>
+              Stack(children: <Widget>[
+                Container(
+                  height: 180,
+                  width: double.infinity,
+                  color: Colors.blue[900],
+                ),
+                Container(
+                  margin: const EdgeInsets.only(top: 20),
+                  child: _input(context),
+                )
+              ]),
+        ));
   }
 
   Widget _inputTile() {
@@ -80,7 +85,7 @@ class _InputScreenState extends State<InputScreen> {
     );
   }
 
-  Widget _input() {
+  Widget _input(BuildContext context) {
     return Container(
       height: double.infinity,
       margin: EdgeInsets.symmetric(horizontal: 8.0),
@@ -300,72 +305,5 @@ class _InputScreenState extends State<InputScreen> {
     return null;
   }
 
-  Widget _buildTagField() {
-    final tagDao = Provider
-        .of<MoorDatabase>(context)
-        .tagDao;
-    final tags = List<Tag>();
-
-    return StreamBuilder<List<Tag>>(
-        stream: tagDao.watchTags(),
-        builder: (context, snapshot) {
-          if (snapshot.data != null) {
-            tags.addAll(snapshot.data);
-          }
-
-          return Padding(
-            padding: const EdgeInsets.symmetric(
-              vertical: 8.0,
-              horizontal: 16.0,
-            ),
-            child: Row(
-              children: <Widget>[
-                Expanded(
-                  flex: 3,
-                  child: DropdownButtonFormField<TagChipItem>(
-                    decoration: InputDecoration(
-                      prefixIcon: Icon(
-                        Icons.attach_file,
-                      ),
-                    ),
-                    items: <DropdownMenuItem<TagChipItem>>[
-                      ...tags.map((tag) =>
-                          DropdownMenuItem(
-                            child: TagChipItem(
-                              tag: tag,
-                            ),
-                          )),
-                    ],
-                    onChanged: (tag) {},
-                    hint: Text('Select your tag!'),
-                    onSaved: (tag) {},
-                  ),
-                ),
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.only(
-                      left: 16.0,
-                    ),
-                    child: RaisedButton(
-                      color: Colors.blue[900],
-                      onPressed: () => _buildCreateNewTagDialog(),
-                      child: Text(
-                        'Add',
-                        style: TextStyle(color: Colors.white),
-                      ),
-                    ),
-                  ),
-                )
-              ],
-            ),
-          );
-        });
-  }
-
-  void _buildCreateNewTagDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => InputTagDialog(title: 'Create a new tag'),
-    );
-  }
+  Widget _buildTagField() => TagField();
 }

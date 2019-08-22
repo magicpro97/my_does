@@ -2,22 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:my_does/ui/widgets/tag_form.dart';
 
 class InputTagDialog extends StatefulWidget {
-  final String title;
+  final bool isCreateDialog;
 
-  InputTagDialog({Key key, this.title}) : super(key: key);
+  InputTagDialog({Key key, this.isCreateDialog}) : super(key: key);
 
   @override
   _InputTagDialogState createState() => _InputTagDialogState();
 }
 
 class _InputTagDialogState extends State<InputTagDialog> {
-  String tagName;
-  Color color;
-
   @override
   void initState() {
-    tagName = '';
-    color = null;
     super.initState();
   }
 
@@ -31,7 +26,7 @@ class _InputTagDialogState extends State<InputTagDialog> {
           ),
           child: Center(
             child: Text(
-              widget.title,
+              widget.isCreateDialog ? "Create a new tag" : "Update your tag",
               style: TextStyle(
                 color: Colors.white,
               ),
@@ -42,18 +37,6 @@ class _InputTagDialogState extends State<InputTagDialog> {
       backgroundColor: Colors.white,
       elevation: 8.0,
       content: TagForm(),
-      actions: <Widget>[
-        FlatButton(
-          onPressed: () => Navigator.pop(context),
-          child: Text(
-            "Done",
-            style: TextStyle(
-              color: Colors.blue[900],
-              fontSize: 16.0,
-            ),
-          ),
-        )
-      ],
     );
   }
 }

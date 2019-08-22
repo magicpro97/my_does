@@ -396,10 +396,9 @@ class Tag extends DataClass implements Insertable<Tag> {
   final int color;
   final DateTime createdDate;
   final DateTime updatedDate;
-  Tag(
-      {@required this.id,
+  Tag({this.id,
       @required this.name,
-      this.color,
+    @required this.color,
       @required this.createdDate,
       @required this.updatedDate});
   factory Tag.fromData(Map<String, dynamic> data, GeneratedDatabase db,
@@ -521,7 +520,7 @@ class $TagsTable extends Tags with TableInfo<$TagsTable, Tag> {
   @override
   GeneratedIntColumn get id => _id ??= _constructId();
   GeneratedIntColumn _constructId() {
-    return GeneratedIntColumn('id', $tableName, false, hasAutoIncrement: true);
+    return GeneratedIntColumn('id', $tableName, true, hasAutoIncrement: true);
   }
 
   final VerificationMeta _nameMeta = const VerificationMeta('name');
@@ -541,7 +540,7 @@ class $TagsTable extends Tags with TableInfo<$TagsTable, Tag> {
     return GeneratedIntColumn(
       'color',
       $tableName,
-      true,
+      false,
     );
   }
 

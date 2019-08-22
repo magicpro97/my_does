@@ -4,9 +4,9 @@ import 'package:my_does/data/repositories/local/db.dart';
 
 class TagChipItem extends StatelessWidget {
   final Tag tag;
-  final Function onDelete;
+  final Function onDeleted;
 
-  TagChipItem({this.tag, this.onDelete});
+  TagChipItem({this.tag, this.onDeleted});
 
   @override
   Widget build(BuildContext context) {
@@ -14,8 +14,13 @@ class TagChipItem extends StatelessWidget {
       backgroundColor: Color(tag.color),
       deleteIcon: Icon(Icons.remove),
       deleteIconColor: Colors.white,
-      onDeleted: () => onDelete,
-      label: Text(tag.name),
+      onDeleted: () => onDeleted(),
+      label: Text(
+        tag.name,
+        style: TextStyle(
+          color: Colors.white,
+        ),
+      ),
     );
   }
 }

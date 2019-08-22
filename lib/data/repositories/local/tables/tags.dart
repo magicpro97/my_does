@@ -1,7 +1,7 @@
 import 'package:moor_flutter/moor_flutter.dart';
 
 class Tags extends Table {
-  IntColumn get id => integer().autoIncrement()();
+  IntColumn get id => integer().autoIncrement().nullable()();
 
   TextColumn get name => text().withLength(min: 0, max: 20)();
 
