@@ -12,9 +12,9 @@ class TagDao extends DatabaseAccessor<MoorDatabase> with _$TagDaoMixin {
 
   Stream<List<Tag>> watchTags() => select(tags).watch();
 
-  Future insertNote(Tag tag) => into(tags).insert(tag);
+  Future insertTag(Tag tag) => into(tags).insert(tag);
 
-  Future updateNote(Tag tag) => update(tags).replace(tag);
+  Future updateTag(Tag tag) => update(tags).replace(tag);
 
-  Future deleteNote(Tag tag) => delete(tags).delete(tag);
+  Future deleteTag(Tag tag) => delete(tags).delete(tag);
 }
