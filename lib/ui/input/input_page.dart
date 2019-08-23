@@ -1,26 +1,26 @@
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:flutter/material.dart';
 import 'package:my_does/data/repositories/local/db.dart';
-import 'package:my_does/ui/home/home.dart';
+import 'package:my_does/ui/home/home_page.dart';
 import 'package:my_does/ui/input/tag_field.dart';
 import 'package:my_does/ui/widgets/tag_chip_item.dart';
 import 'package:my_does/utils/date_time_utils.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 
-class InputScreen extends StatefulWidget {
+class InputPage extends StatefulWidget {
   static String routeAddName = '/AddScreen';
   static String routeEditName = '/EditScreen';
 
   final Note note;
 
-  InputScreen({this.note});
+  InputPage({this.note});
 
   @override
-  _InputScreenState createState() => _InputScreenState();
+  _InputPageState createState() => _InputPageState();
 }
 
-class _InputScreenState extends State<InputScreen> {
+class _InputPageState extends State<InputPage> {
   String title;
   String description;
   String date;
@@ -277,7 +277,7 @@ class _InputScreenState extends State<InputScreen> {
         noteDao.updateNote(_note);
       }
       Navigator.pushNamedAndRemoveUntil(
-          context, HomeScreen.routeName, (Route<dynamic> route) => false);
+          context, HomePage.routeName, (Route<dynamic> route) => false);
     } else {
       setState(() => autoValidate = true);
     }
