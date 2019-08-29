@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:my_does/data/repositories/local/db.dart';
-import 'package:my_does/ui/widgets/input_tag_dialog.dart';
-import 'package:my_does/ui/widgets/tag_chip_item.dart';
+import 'package:my_does/features/input/widgets/input_tag_dialog.dart';
+import 'package:my_does/features/input/widgets/tag_chip_item.dart';
 import 'package:provider/provider.dart';
 
 class TagField extends StatefulWidget {

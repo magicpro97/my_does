@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:my_does/data/repositories/local/db.dart';
-import 'package:my_does/ui/home/widgets/home_tab_bar.dart';
-import 'package:my_does/ui/home/widgets/home_tab_view.dart';
-import 'package:my_does/ui/input/input_page.dart';
+import 'package:my_does/features/home/widgets/home_tab_bar.dart';
+import 'package:my_does/features/home/widgets/home_tab_view.dart';
+import 'package:my_does/features/input/input_page.dart';
 import 'package:provider/provider.dart';
 
 import 'bloc/bloc.dart';

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:my_does/data/repositories/local/db.dart';
-import 'package:my_does/ui/home/bloc/bloc.dart';
-import 'package:my_does/ui/input/input_page.dart';
-import 'package:my_does/ui/widgets/note_card_item.dart';
+import 'package:my_does/features/home/bloc/bloc.dart';
+import 'package:my_does/features/home/widgets/note_card_item.dart';
+import 'package:my_does/features/input/input_page.dart';
 import 'package:provider/provider.dart';
 
 class HomeTabView extends StatelessWidget {
