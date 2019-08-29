@@ -9,14 +9,12 @@ import 'package:provider/provider.dart';
 class HomeTabView extends StatelessWidget {
   final List<Note> notes;
   final List<Tag> tags;
-  final TabController tabController;
 
-  HomeTabView({this.notes, this.tags, @required this.tabController});
+  HomeTabView({this.notes, this.tags});
 
   @override
   Widget build(BuildContext context) {
     return TabBarView(
-      controller: tabController,
       children: <Widget>[
         ...tags.map((tag) => _buildTabView()).toList(),
       ],
