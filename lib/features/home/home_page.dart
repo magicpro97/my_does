@@ -17,8 +17,9 @@ class HomePage extends StatelessWidget {
     final db = Provider.of<MoorDatabase>(context);
     homeBloc.noteDao = db.noteDao;
     homeBloc.tagDao = db.tagDao;
-    Future.delayed(
-        Duration(seconds: 3), () => homeBloc.dispatch(GetDataFromLocalDb()));
+    Future(
+          () => homeBloc.dispatch(GetDataFromLocalDb()),
+    );
 
     return Scaffold(
       body: BlocBuilder<HomeBloc, HomeState>(
@@ -31,7 +32,6 @@ class HomePage extends StatelessWidget {
                     Expanded(
                         flex: orientation == Orientation.landscape ? 1 : 2,
                         child: _buildAppLabel()),
-                    Divider(),
                     Expanded(
                       flex: orientation == Orientation.landscape ? 2 : 6,
                       child: state is InitialState

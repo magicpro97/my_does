@@ -21,6 +21,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   ) async* {
     if (event is GetDataFromLocalDb) {
       yield LoadingState();
+      await Future.delayed(Duration(milliseconds: 500));
       yield InitialState(listTagStream: tagDao.watchTags(),
           listNoteStream: noteDao.watchNotes());
     } else if (event is DeleteNote) {

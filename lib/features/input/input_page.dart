@@ -1,7 +1,9 @@
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:my_does/data/repositories/local/db.dart';
 import 'package:my_does/features/home/home_page.dart';
+import 'package:my_does/features/input/bloc/bloc.dart';
 import 'package:my_does/features/input/tag_field.dart';
 import 'package:my_does/features/input/widgets/tag_chip_item.dart';
 import 'package:my_does/utils/date_time_utils.dart';
@@ -53,25 +55,31 @@ class _InputPageState extends State<InputPage> {
 
   @override
   Widget build(BuildContext context) {
+    final inputBloc = Provider.of<InputBloc>(context);
+
     return Scaffold(
         appBar: AppBar(
           backgroundColor: Colors.blue[900],
           centerTitle: true,
           title: _inputTile(),
         ),
-        body: Builder(
-          builder: (BuildContext context) =>
-              Stack(children: <Widget>[
-                Container(
-                  height: 180,
-                  width: double.infinity,
-                  color: Colors.blue[900],
-                ),
-                Container(
-                  margin: const EdgeInsets.only(top: 20),
-                  child: _input(context),
-                )
-              ]),
+        body: BlocBuilder(
+          bloc: inputBloc,
+          builder: (context, state) =>
+              Builder(
+                builder: (BuildContext context) =>
+                    Stack(children: <Widget>[
+                      Container(
+                        height: 180,
+                        width: double.infinity,
+                        color: Colors.blue[900],
+                      ),
+                      Container(
+                        margin: const EdgeInsets.only(top: 20),
+                        child: _inputBody(context, state),
+                      )
+                    ]),
+              ),
         ));
   }
 
@@ -85,62 +93,61 @@ class _InputPageState extends State<InputPage> {
     );
   }
 
-  Widget _input(BuildContext context) {
-    return Container(
-      height: double.infinity,
-      margin: EdgeInsets.symmetric(horizontal: 8.0),
-      child: Card(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16.0),
-        ),
-        child: SingleChildScrollView(
-          child: Form(
-            key: formKey,
-            autovalidate: autoValidate,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: <Widget>[
-                _buildTitleField(),
-                _buildDescriptionField(),
-                _buildTagField(),
-                _buildDateField(),
-                _buildTimeField(),
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: SizedBox(
-                    width: double.infinity,
-                    height: 50.0,
-                    child: RaisedButton(
-                      onPressed: () => submitFormAction(context),
+  Widget _inputBody(BuildContext context, InputState state) =>
+      Container(
+        height: double.infinity,
+        margin: EdgeInsets.symmetric(horizontal: 8.0),
+        child: Card(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16.0),
+          ),
+          child: SingleChildScrollView(
+            child: Form(
+              key: formKey,
+              autovalidate: autoValidate,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  _buildTitleField(),
+                  _buildDescriptionField(),
+                  _buildTagField(),
+                  _buildDateField(),
+                  _buildTimeField(),
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: SizedBox(
+                      width: double.infinity,
+                      height: 50.0,
+                      child: RaisedButton(
+                        onPressed: () => submitFormAction(context),
+                        child: Text(
+                          _isCreateFrom() ? 'Create' : 'Update',
+                          style: TextStyle(fontSize: 18),
+                        ),
+                        textColor: Colors.white,
+                        color: Colors.pink,
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: FlatButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
                       child: Text(
-                        _isCreateFrom() ? 'Create' : 'Update',
+                        'Cancel',
                         style: TextStyle(fontSize: 18),
                       ),
-                      textColor: Colors.white,
-                      color: Colors.pink,
                     ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: FlatButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    child: Text(
-                      'Cancel',
-                      style: TextStyle(fontSize: 18),
-                    ),
-                  ),
-                )
-              ],
+                  )
+                ],
+              ),
             ),
           ),
         ),
-      ),
-    );
-  }
+      );
 
   Padding _buildDescriptionField() {
     return Padding(

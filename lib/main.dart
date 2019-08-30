@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:my_does/data/repositories/local/db.dart';
 import 'package:my_does/features/home/home_page.dart';
+import 'package:my_does/features/input/bloc/bloc.dart';
 import 'package:my_does/features/input/input_page.dart';
 import 'package:provider/provider.dart';
 
@@ -24,7 +25,10 @@ class _MyAppState extends State<MyApp> {
         ),
         BlocProvider(
           builder: (_) => HomeBloc(),
-        )
+        ),
+        BlocProvider(
+          builder: (_) => InputBloc(),
+        ),
       ],
       child: _buildApp(),
     );

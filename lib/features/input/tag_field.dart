@@ -1,52 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:my_does/data/repositories/local/db.dart';
 import 'package:my_does/features/input/widgets/input_tag_dialog.dart';
 import 'package:my_does/features/input/widgets/tag_chip_item.dart';
 import 'package:provider/provider.dart';
 
-class TagField extends StatefulWidget {
-  TagField({Key key}) : super(key: key);
+import 'bloc/bloc.dart';
 
-  @override
-  _TagFieldState createState() => _TagFieldState();
-}
-
-class _TagFieldState extends State<TagField> {
-  TagChipItem tagChipItem;
-
-  @override
-  void initState() {
-    tagChipItem = TagChipItem(
-      tag: null,
-      onDeleted: null,
-    );
-    super.initState();
-  }
-
+class TagField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final tagDao = Provider.of<MoorDatabase>(context).tagDao;
-    List<Tag> tags;
-    List<DropdownMenuItem<TagChipItem>> tagChipItems;
+    final inputBloc = Provider.of<InputBloc>(context);
+    inputBloc.tagDao = tagDao;
+    Future(() => inputBloc.dispatch(InitialPage()));
 
-    return StreamBuilder<List<Tag>>(
-        stream: tagDao.watchTags(),
-        builder: (context, snapshot) {
-          if (snapshot.data != null) {
-            tags = snapshot.data;
-            tagChipItems = tags
-                .map((tag) => DropdownMenuItem<TagChipItem>(
-                      child: TagChipItem(
-                        tag: tag,
-                        onDeleted: () => _deleteTagAction(tag, context),
-                      ),
-                    ))
-                .toList();
-            tagChipItem = tagChipItems.first.value;
-          } else {
-            tagChipItems = [];
-          }
-
+    return BlocBuilder(
+      bloc: inputBloc,
+      builder: (context, state) {
+        if (state is InitialTagFieldState) {
           return Padding(
             padding: const EdgeInsets.symmetric(
               vertical: 8.0,
@@ -61,19 +33,42 @@ class _TagFieldState extends State<TagField> {
                       width: 150,
                       child: DropdownButtonHideUnderline(
                         child: ButtonTheme(
-                          alignedDropdown: true,
-                          child: DropdownButton<TagChipItem>(
-                            items: tagChipItems,
-                            value: tagChipItem,
-                            onChanged: (newTag) {
-                              setState(() {
-                                tagChipItem = newTag;
-                                print(newTag);
-                                print(tagChipItem);
-                              });
-                            },
-                          ),
-                        ),
+                            alignedDropdown: true,
+                            child: StreamBuilder<List<Tag>>(
+                                stream: state.listTagStream,
+                                builder: (context, snapshot) {
+                                  List<Tag> tags;
+
+                                  if (snapshot.hasData) {
+                                    tags = snapshot.data;
+                                  } else {
+                                    tags = [];
+                                  }
+
+                                  final List<DropdownMenuItem<Tag>> tagItems =
+                                  tags
+                                      .map((tag) =>
+                                      DropdownMenuItem<Tag>(
+                                        value: tag,
+                                        child: TagChipItem(
+                                          tag: tag,
+                                          onDeleted: () =>
+                                              _deleteTagAction(tag,
+                                                  context, inputBloc),
+                                        ),
+                                      ))
+                                      .toList();
+
+                                  return DropdownButton<Tag>(
+                                    items: tagItems,
+                                    value: inputBloc.tag ?? tags.first,
+                                    onChanged: (item) {
+                                      print(item);
+                                      inputBloc.dispatch(SelectedTagChange(
+                                          selectedItem: item));
+                                    },
+                                  );
+                                })),
                       ),
                     ),
                     Padding(
@@ -82,7 +77,7 @@ class _TagFieldState extends State<TagField> {
                       ),
                       child: RaisedButton(
                         color: Colors.blue[900],
-                        onPressed: () => _buildCreateNewTagDialog(),
+                        onPressed: () => _buildCreateNewTagDialog(context),
                         child: Text(
                           'Add',
                           style: TextStyle(color: Colors.white),
@@ -95,10 +90,14 @@ class _TagFieldState extends State<TagField> {
               ],
             ),
           );
-        });
+        } else {
+          return Container();
+        }
+      },
+    );
   }
 
-  void _buildCreateNewTagDialog() {
+  void _buildCreateNewTagDialog(BuildContext context) {
     showDialog(
       context: context,
       builder: (context) => InputTagDialog(
@@ -107,13 +106,12 @@ class _TagFieldState extends State<TagField> {
     );
   }
 
-  void _deleteTagAction(Tag tag, BuildContext context) {
-    final tagDao = Provider.of<MoorDatabase>(context).tagDao;
-    setState(() {});
-    tagDao.deleteTag(tag);
+  void _deleteTagAction(Tag tag, BuildContext context, InputBloc inputBloc) {
+    inputBloc.dispatch(DeleteTag(tag: tag));
     Scaffold.of(context).showSnackBar(SnackBar(
         content: Text('Deleted'),
         action: SnackBarAction(
-            label: 'Undo', onPressed: () => tagDao.insertTag(tag))));
+            label: 'Undo',
+            onPressed: () => inputBloc.dispatch(InsertTag(tag: tag)))));
   }
 }
