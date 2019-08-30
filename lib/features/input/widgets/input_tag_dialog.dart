@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:my_does/ui/widgets/tag_form.dart';
+import 'package:my_does/features/input/widgets/tag_form.dart';
 
 class InputTagDialog extends StatefulWidget {
   final bool isCreateDialog;

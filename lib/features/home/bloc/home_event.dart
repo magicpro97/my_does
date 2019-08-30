@@ -16,8 +16,6 @@ class InsertNote extends HomeEvent {
   InsertNote({this.note, this.index}) : super([note, index]);
 }
 
-class UpdateNote extends HomeEvent {}
-
 class DeleteNote extends HomeEvent {
   final Note note;
 

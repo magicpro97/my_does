@@ -78,3 +78,4 @@ lib/data/repositories/local/daos/tag_dao.g.dart
 gen/
 ios/Flutter/flutter_export_environment.sh
 lib/ui/base/
+.vscode

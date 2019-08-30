@@ -1,67 +1,45 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:my_does/data/repositories/local/db.dart';
-import 'package:my_does/ui/home/widgets/home_tab_bar.dart';
-import 'package:my_does/ui/home/widgets/home_tab_view.dart';
-import 'package:my_does/ui/input/input_page.dart';
+import 'package:my_does/features/home/widgets/home_tab_bar.dart';
+import 'package:my_does/features/home/widgets/home_tab_view.dart';
+import 'package:my_does/features/input/input_page.dart';
 import 'package:provider/provider.dart';
 
 import 'bloc/bloc.dart';
 
-class HomePage extends StatefulWidget {
+class HomePage extends StatelessWidget {
   static String routeName = '/HomeScreen';
 
-  HomePage();
-
-  @override
-  _HomePageState createState() => _HomePageState();
-}
-
-class _HomePageState extends State<HomePage>
-    with SingleTickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     final homeBloc = Provider.of<HomeBloc>(context);
+    final db = Provider.of<MoorDatabase>(context);
+    homeBloc.noteDao = db.noteDao;
+    homeBloc.tagDao = db.tagDao;
+    Future(
+          () => homeBloc.dispatch(GetDataFromLocalDb()),
+    );
 
     return Scaffold(
       body: BlocBuilder<HomeBloc, HomeState>(
         bloc: homeBloc,
         builder: (BuildContext context, HomeState state) {
-          return Column(
-            children: <Widget>[
-              Container(
-                color: Colors.blue[900],
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
+          return OrientationBuilder(
+            builder: (context, orientation) =>
+                Column(
                   children: <Widget>[
-                    Padding(
-                      padding: const EdgeInsets.only(top: 40.0, bottom: 10.0),
-                      child: Center(
-                        child: Text(
-                          'My Does',
-                          style: TextStyle(color: Colors.white, fontSize: 40),
-                        ),
-                      ),
-                    ),
-                    Center(
-                      child: Text(
-                        'Finish Them Quickly Today',
-                        style: TextStyle(color: Colors.white30, fontSize: 20),
-                      ),
-                    ),
-                    SizedBox(
-                      height: 15.0,
-                    ),
+                    Expanded(
+                        flex: orientation == Orientation.landscape ? 1 : 2,
+                        child: _buildAppLabel()),
+                    Expanded(
+                      flex: orientation == Orientation.landscape ? 2 : 6,
+                      child: state is InitialState
+                          ? _buildContentPage(state)
+                          : _buildLoadingContent(state),
+                    )
                   ],
                 ),
-              ),
-              Expanded(
-                flex: 4,
-                child: _buildContentPage(state),
-              ),
-            ],
           );
         },
       ),
@@ -70,6 +48,37 @@ class _HomePageState extends State<HomePage>
           Navigator.pushNamed(context, InputPage.routeAddName);
         },
         child: Icon(Icons.add),
+      ),
+    );
+  }
+
+  Widget _buildAppLabel() {
+    return Container(
+      color: Colors.blue[900],
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: <Widget>[
+          Padding(
+            padding: const EdgeInsets.only(top: 40.0, bottom: 10.0),
+            child: Center(
+              child: Text(
+                'My Does',
+                style: TextStyle(color: Colors.white, fontSize: 40),
+              ),
+            ),
+          ),
+          Center(
+            child: Text(
+              'Finish Them Quickly Today',
+              style: TextStyle(color: Colors.white30, fontSize: 20),
+            ),
+          ),
+          SizedBox(
+            height: 15.0,
+          ),
+        ],
       ),
     );
   }
@@ -92,10 +101,6 @@ class _HomePageState extends State<HomePage>
               if (!tags.contains(defaultTag())) {
                 tags.insert(0, defaultTag());
               }
-              final tabController = TabController(
-                vsync: this,
-                length: tags.length,
-              );
 
               return StreamBuilder(
                 stream: state.listNoteStream,
@@ -103,7 +108,11 @@ class _HomePageState extends State<HomePage>
                   if (snapshot.hasData) {
                     final notes = snapshot.data;
 
-                    return Column(
+                    return DefaultTabController(
+                      length: tags.length,
+                      child: OrientationBuilder(
+                        builder: (context, orientation) =>
+                            Column(
                       children: <Widget>[
                         Expanded(
                           child: Container(
@@ -112,20 +121,20 @@ class _HomePageState extends State<HomePage>
                               color: Colors.blue[900],
                             ),
                             child: HomeTabBar(
-                              tabController: tabController,
                               tags: tags,
                             ),
                           ),
                         ),
                         Expanded(
-                          flex: 7,
+                          flex: orientation == Orientation.portrait ? 7 : 4,
                           child: HomeTabView(
                             tags: tags,
                             notes: notes,
-                            tabController: tabController,
                           ),
                         )
                       ],
+                            ),
+                      ),
                     );
                   } else {
                     return Container();
@@ -136,4 +145,17 @@ class _HomePageState extends State<HomePage>
               return Container();
             }
           });
+
+  Widget _buildLoadingContent(HomeState state) =>
+      Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Center(
+          child: Column(
+            children: <Widget>[
+              CircularProgressIndicator(),
+              Text('Loading...'),
+            ],
+          ),
+        ),
+      );
 }
