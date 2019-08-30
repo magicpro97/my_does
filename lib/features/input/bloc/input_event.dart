@@ -26,3 +26,11 @@ class InsertTag extends InputEvent {
 
   InsertTag({this.tag}) : super([tag]);
 }
+
+class InsertNote extends InputEvent {}
+
+class UpdateNote extends InputEvent {
+  final Note note;
+
+  UpdateNote({this.note}) : super([note]);
+}

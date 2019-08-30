@@ -8,6 +8,10 @@ import 'package:provider/provider.dart';
 import 'bloc/bloc.dart';
 
 class TagField extends StatelessWidget {
+  final Note note;
+
+  TagField({this.note});
+
   @override
   Widget build(BuildContext context) {
     final tagDao = Provider.of<MoorDatabase>(context).tagDao;
@@ -53,15 +57,15 @@ class TagField extends StatelessWidget {
                                         child: TagChipItem(
                                           tag: tag,
                                           onDeleted: () =>
-                                              _deleteTagAction(tag,
-                                                  context, inputBloc),
+                                              _deleteTagAction(
+                                                  tag, context),
                                         ),
                                       ))
                                       .toList();
 
                                   return DropdownButton<Tag>(
                                     items: tagItems,
-                                    value: inputBloc.tag ?? tags.first,
+                                    value: _initFirstTag(tags),
                                     onChanged: (item) {
                                       print(item);
                                       inputBloc.dispatch(SelectedTagChange(
@@ -106,12 +110,28 @@ class TagField extends StatelessWidget {
     );
   }
 
-  void _deleteTagAction(Tag tag, BuildContext context, InputBloc inputBloc) {
+  void _deleteTagAction(Tag tag, BuildContext context) {
+    final inputBloc = Provider.of<InputBloc>(context);
     inputBloc.dispatch(DeleteTag(tag: tag));
     Scaffold.of(context).showSnackBar(SnackBar(
+        duration: Duration(seconds: 2),
         content: Text('Deleted'),
         action: SnackBarAction(
             label: 'Undo',
             onPressed: () => inputBloc.dispatch(InsertTag(tag: tag)))));
+  }
+
+  Tag _initFirstTag(List<Tag> tags) {
+    if (tags.isNotEmpty) {
+      if (note == null) {
+        return tags.first;
+      } else {
+        final index =
+        tags.map((tag) => tag.name).toList().indexOf(note.tagName);
+        return index > -1 ? tags[index] : null;
+      }
+    } else {
+      return null;
+    }
   }
 }

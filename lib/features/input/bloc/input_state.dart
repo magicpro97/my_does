@@ -9,6 +9,8 @@ abstract class InputState extends Equatable {
   InputState([List props = const <dynamic>[]]) : super(props);
 }
 
+class InitialState extends InputState {}
+
 class InitialTagFieldState extends InputState {
   final Stream<List<Tag>> listTagStream;
 

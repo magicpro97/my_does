@@ -58,6 +58,7 @@ class HomeTabView extends StatelessWidget {
     homeBloc.dispatch(DeleteNote(note: note));
     Scaffold.of(context).showSnackBar(
       SnackBar(
+        duration: Duration(seconds: 2),
         content: Text('Deleted'),
         action: SnackBarAction(
           label: 'Undo',
